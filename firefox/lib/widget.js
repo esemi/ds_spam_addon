@@ -14,16 +14,18 @@ exports.create = function()
 		height:200,
 		contentURL: self.data.url("panel.html")
 	});
-	mainPanel.port.emit('init');
+	mainPanel.on('show', function(){
+
+		//check url and emit event show/hide
+		//mainPanel.port.emit('show-panel')
+		//mainPanel.port.emit('hide-panel')
+	});
 
 	myWidget = WIDGET.Widget({
 		id: "dsSpamWidget",
 		label: "DS spam",
 		contentURL: self.data.url("i/16.png"),
-		panel: mainPanel,
-		onClick: function() {
-			console.log('widget click callback');
-		}
+		panel: mainPanel
 	});
 };
 
@@ -32,7 +34,7 @@ exports.initListeners = function()
 {
 	console.log('widget init listeners call');
 
-	myWidget.port.on("fire", function() {
-		console.log("fire button");
+	myWidget.port.on("spamStart", function() {
+		console.log("spamStart button clicked");
 	});
 };
