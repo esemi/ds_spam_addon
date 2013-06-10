@@ -10,5 +10,4 @@ var myWidet = require("./widget.js");
 exports.main = function(options, callbacks)
 {
 	myWidet.create();
-	myWidet.initListeners();
 };

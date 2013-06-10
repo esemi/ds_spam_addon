@@ -1,17 +1,16 @@
-//первонаяальный инит событий
-function init()
-{
+(function(){
 	document.getElementById("spamStart").onclick = function() {
-		addon.port.emit("spamStart");
+		console.log('spamStart button fire');
+		self.port.emit("spamStart", {test:'test'});
 	};
-};
 
-//открываем управляющую панель при событии
-addon.port.on("show-panel", function(){
-	console.log('show panel fire');
-});
+	//открываем управляющую панель при событии
+	self.port.on("show-panel", function(){
+		console.log('show panel fire');
+	});
 
-//скрываем управляющую панель при событии
-addon.port.on("hide-panel", function(){
-	console.log('hide panel fire');
-});
+	//скрываем управляющую панель при событии
+	self.port.on("hide-panel", function(){
+		console.log('hide panel fire');
+	});
+})();
