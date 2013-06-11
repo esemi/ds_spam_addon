@@ -7,6 +7,9 @@ var myConfig = require("./config.js").config;
 var myWidget = null;
 var myPanel = null;
 
+exports.panel = myPanel;
+exports.widget = myWidget;
+
 exports.create = function()
 {
 	console.log('create widget call');
@@ -18,9 +21,13 @@ exports.create = function()
 		contentScriptFile: self.data.url('panel.js'),
 		contentScriptWhen: 'ready',
 		onShow: function() {
-			console.log(TABS.activeTab.url); //@TODO test url on game and parse it on SESSID and ck
-			//mainPanel.port.emit('show-panel');
-			//mainPanel.port.emit('hide-panel');
+
+			console.log(TABS.activeTab.url);
+			if( isGameUrl(TABS.activeTab.url) ){
+				myPanel.port.emit('show-panel');
+			}else{
+				myPanel.port.emit('hide-panel');
+			}
 		}
 	});
 
@@ -37,3 +44,17 @@ exports.create = function()
 		console.log(options);
 	});
 };
+
+function isGameUrl(url)
+{
+	var regexps = myConfig.gameDomainRegexp;
+	for( var i in regexps )
+	{
+		if(
+			regexps[i].test(url) &&
+			url.indexOf('/ds/index.php') >= 0
+		)
+			return true;
+	}
+	return false;
+}
