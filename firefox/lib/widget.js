@@ -1,8 +1,10 @@
 var self = require("sdk/self");
 var WIDGET = require("sdk/widget");
 var TABS = require("sdk/tabs");
+var NOTIFICATIONS = require("sdk/notifications");
 
 var myConfig = require("./config.js").config;
+var gameClient = require("./gameClient.js").getClient();
 
 var myWidget = null;
 var myPanel = null;
@@ -21,11 +23,13 @@ exports.create = function()
 		contentScriptFile: self.data.url('panel.js'),
 		contentScriptWhen: 'ready',
 		onShow: function() {
-
-			console.log(TABS.activeTab.url);
-			if( isGameUrl(TABS.activeTab.url) ){
-				myPanel.port.emit('show-panel');
+			var url = TABS.activeTab.url;
+			console.log(url);
+			if( gameClient.isGameUrl(url) ){
+				console.log('show panel');
+				myPanel.port.emit('show-panel',myConfig.panelOptions);
 			}else{
+				console.log('hide panel');
 				myPanel.port.emit('hide-panel');
 			}
 		}
@@ -38,23 +42,45 @@ exports.create = function()
 		panel: myPanel
 	});
 
+
+};
+
+exports.initListeners = function()
+{
 	//start spam button
 	myPanel.port.on("spamStart", function(options) {
 		console.log("spamStart button clicked");
-		console.log(options);
+		spamFireCallback(options.armyCount, options.enemyAdr);
 	});
 };
 
-function isGameUrl(url)
-{
-	var regexps = myConfig.gameDomainRegexp;
-	for( var i in regexps )
+function spamFireCallback(count, enemy){
+	var res = gameClient.parseInitParams();
+	if( res !== true )
 	{
-		if(
-			regexps[i].test(url) &&
-			url.indexOf('/ds/index.php') >= 0
-		)
-			return true;
+		console.log('first init params failed');
+		NOTIFICATIONS.notify({
+			title: "DSspam failed",
+			text: "Не удалось получить начальные параметры сессии"
+		});
+		return;
 	}
-	return false;
+
+	var res = gameClient.checkin();
+	if( res !== true )
+	{
+		console.log('checkin failed');
+		NOTIFICATIONS.notify({
+			title: "DSspam failed",
+			text: "Не удалось обновить сессию"
+		});
+		return;
+	}
+
+	//--------------------для каждой армии
+		//создаём армию
+		//шлём армию
+		//проверяем на ошибки
+	//--------------------
 }
+

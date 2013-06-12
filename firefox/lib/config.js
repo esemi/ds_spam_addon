@@ -3,5 +3,8 @@ exports.config = {
 		/dsga\.me/i,
 		/destinysphere\./i,
 		/ds-game\./i
-	]
+	],
+	"panelOptions": {
+		armyLimit: 300
+	}
 };
