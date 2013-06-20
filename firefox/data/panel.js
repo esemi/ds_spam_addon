@@ -1,7 +1,13 @@
 (function(){
 	document.getElementById("spamStart").onclick = function() {
 		console.log('spamStart button fire');
-		self.port.emit("spamStart", {test:'test'});
+		self.port.emit("spamStart", {
+			countArmy:5,
+			ring: 3,
+			compl: 1,
+			sota: 1,
+			unitId: 2
+		});
 	};
 
 	//открываем управляющую панель при событии
