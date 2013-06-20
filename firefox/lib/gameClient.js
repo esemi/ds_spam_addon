@@ -1,4 +1,4 @@
-
+var REQUEST = require("sdk/request");
 var URL_PARSER = require("sdk/url").URL;
 
 var gameClient = function(){
@@ -18,7 +18,7 @@ gameClient.prototype.init = function(currentUrl){
 
 	this._sessid = null;
 	this._ck = null;
-	this._baseUrl = url.host;
+	this._baseUrl = url.scheme + url.host;
 
 	console.log(url.path);
 	if( /^\/ds\/index.php\?/.test(url.path) )
@@ -52,6 +52,15 @@ gameClient.prototype.init = function(currentUrl){
  * @returns mixed True if success, string contains error if fail
  */
 gameClient.prototype.createArmy = function(unitId){
+	var armyName = 'randomname13545';
+	var req = REQUEST.Request({
+		url : this._baseUrl + '/ds/useraction.php?SIDIX=' + this._sessid,
+		content: {
+			"ck": this._ck,
+			"onLoad": "[type Function]",
+			"xmldata": '<createarmy><armyname><![CDATA[' + armyName + ']></armyname><unit id="' + unitId + '" count="1"/></createarmy>'
+		}
+	});
 
 	
 	return true;
