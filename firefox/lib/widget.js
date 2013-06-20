@@ -25,7 +25,9 @@ exports.create = function()
 		onShow: function() {
 			var url = TABS.activeTab.url;
 			console.log(url);
-			if( gameClient.isGameUrl(url) ){
+
+			var res = gameClient.init(url);
+			if( res ){
 				console.log('show panel');
 				myPanel.port.emit('show-panel',myConfig.panelOptions);
 			}else{
@@ -41,8 +43,6 @@ exports.create = function()
 		contentURL: self.data.url("i/16.png"),
 		panel: myPanel
 	});
-
-
 };
 
 exports.initListeners = function()
@@ -50,37 +50,46 @@ exports.initListeners = function()
 	//start spam button
 	myPanel.port.on("spamStart", function(options) {
 		console.log("spamStart button clicked");
-		spamFireCallback(options.armyCount, options.enemyAdr);
+		spamStartCallback(myPanel, gameClient, options);
 	});
+
 };
 
-function spamFireCallback(count, enemy){
-	var res = gameClient.parseInitParams();
-	if( res !== true )
-	{
-		console.log('first init params failed');
-		NOTIFICATIONS.notify({
-			title: "DSspam failed",
-			text: "Не удалось получить начальные параметры сессии"
-		});
+function spamStartCallback(panel, client, options)
+{
+
+	var res = client.init(TABS.activeTab.url);
+	if( res === false ){
+		//@TODO print error
+		console.log('not init client');
+		console.log(TABS.activeTab.url);
 		return;
 	}
 
-	var res = gameClient.checkin();
-	if( res !== true )
-	{
-		console.log('checkin failed');
-		NOTIFICATIONS.notify({
-			title: "DSspam failed",
-			text: "Не удалось обновить сессию"
-		});
+	//check options
+	var intRegExp = /\d+/;
+	if(
+		typeof options.countArmy === 'undefined' || !intRegExp.test(options.countArmy) ||
+		typeof options.ring === 'undefined' || !intRegExp.test(options.ring) ||
+		typeof options.compl === 'undefined' || !intRegExp.test(options.compl) ||
+		typeof options.sota === 'undefined' || !intRegExp.test(options.sota) ||
+		typeof options.unitId === 'undefined' || !intRegExp.test(options.unitId)
+	){
+		//@TODO print error
+		console.log('invalid options');
 		return;
 	}
 
-	//--------------------для каждой армии
-		//создаём армию
-		//шлём армию
-		//проверяем на ошибки
-	//--------------------
+	//@TODO send log messages to panel
+	console.log('start ' + options.countArmy + ' army create and send to ' + options.ring + '.' + options.compl + '.' + options.sota + ' by unit id ' + options.unitId);
+
+	for( var i=1; i<=options.countArmy; i++ )
+	{
+		//создали армию
+		client.createArmy(options.unitId);
+
+		//отправили армию
+
+	}
 }
 

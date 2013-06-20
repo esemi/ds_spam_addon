@@ -1,7 +1,6 @@
 var self = require("sdk/self");
-var { Cc, Ci } = require('chrome');
 var TABS = require("sdk/tabs");
-var URL = require("sdk/url");
+var URL_PARSER = require("sdk/url").URL;
 var XHR = require("sdk/net/xhr").XMLHttpRequest;
 var REQUEST = require("sdk/request");
 
@@ -9,75 +8,75 @@ var myConfig = require("./config.js").config;
 
 var instance = null;
 
-var GameClient = function(){
-	this._url = '';
-	this._ck = '';
-	this._sessid = '';
-	this._cookie = '';
+var gameClient = function(){
+	this._sessid = null;
+	this._ck = null;
+	this._baseUrl = null;
+	this._isInititated = false;
 };
 
-GameClient.prototype.isGameUrl = function(url){
-	var regexps = myConfig.gameDomainRegexp;
-	for( var i in regexps )
+/**
+ * Init game client by url
+ *
+ * @param string Current tab url (must be game url example http://www.dsga.me/ds/index.php?ck=5xt7xLNacS&VERS=RU_CLASSIC&sport=17441&SIDIX=v0mb4o1n1rgbf5lvh5mm6kbui2)
+ * @returns boolean Success initiated flag
+ */
+gameClient.prototype.init = function(currentUrl){
+	var url = URL_PARSER(currentUrl);
+
+	this._sessid = null;
+	this._ck = null;
+	this._baseUrl = url.scheme + url.host;
+
+	console.log(url.path);
+	if( /^\/ds\/index.php\?/.test(url.path) )
 	{
-		if(
-			regexps[i].test(url) &&
-			url.indexOf('/ds/index.php') >= 0
-		)
-			return true;
+		var ckMatches = /ck=([\d\w]{10})\&/.exec(url.path);
+		if( ckMatches !== null && ckMatches.length === 2 )
+			this._ck = ckMatches[1];
+
+		var ssMatches = /SIDIX=([\w\d]{26})/.exec(url.path);
+		if( ssMatches !== null && ssMatches.length === 2 )
+			this._sessid = ssMatches[1];
 	}
-	return false;
+
+	if(
+		this._sessid === null ||
+		this._ck === null ||
+		this._baseUrl === null
+	){
+		this._isInititated = false;
+	}else{
+		this._isInititated = true;
+	}
+
+	return this._isInititated;
 };
 
-GameClient.prototype._parseCookie = function(){
-	var ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-	var uri = ios.newURI(TABS.activeTab.url, null, null);
-	var cookieSvc = Cc["@mozilla.org/cookieService;1"].getService(Ci.nsICookieService);
-	this._cookie = cookieSvc.getCookieString(uri, null);
+/**
+ * Create army from single unit
+ *
+ * @param int unitId Id unit for create spam army
+ * @returns mixed True if success, string contains error if fail
+ */
+gameClient.prototype.createArmy = function(unitId){
+	/*var armyName = 'randomname13545';
+	var req = REQUEST.Request({
+		url : this._baseUrl + '/ds/useraction.php?SIDIX=' + this._sessid,
+		content: {
+			"ck": this._ck,
+			"onLoad": "[type Function]",
+			"xmldata": '<createarmy><armyname><![CDATA[' + armyName + ']></armyname><unit id="' + unitId + '" count="1"/></createarmy>'
+		}
+	});
+
+
+	return true;*/
 };
 
-GameClient.prototype._parseCkFromLink = function(url){
-	var matches = /ck=([\w\d]{10})/i.exec(url);
-	if( matches !== null && typeof matches[1] !== 'undefined' )
-		this._ck=matches[1];
-	else
-		this._ck = '';
-};
-
-GameClient.prototype._parseSessid = function(url){
-	var matches = /SIDIX=([\w\d]{26})/i.exec(url);
-	if( matches !== null && typeof matches[1] !== 'undefined' )
-		this._sessid=matches[1];
-	else
-		this._sessid = '';
-};
-
-GameClient.prototype._parseUrl = function(url){
-	var url = URL.URL(url);
-	if( url.host !== null )
-		this._url=url.host;
-	else
-		this._url = '';
-};
-
-GameClient.prototype.parseInitParams = function(){
-
-	this._parseCookie();
-
-	this._parseCkFromLink(TABS.activeTab.url);
-
-	this._parseSessid(TABS.activeTab.url);
-
-	this._parseUrl(TABS.activeTab.url);
-
-	console.log("sessid: " + this._sessid + " ck:" + this._ck + " url:" + this._url);
-
-	return (this._sessid.length > 0 && this._ck.length > 0 && this._cookie.length > 0 && this._url.length > 0);
-};
-
-GameClient.prototype._parseCk = function(content){
+gameClient.prototype._parseCk = function(content){
 	var matches = /\&ck=([\d\w]{10})\&loadkey=/i.exec(content);
-	if( matches !== null && typeof matches[1] !== 'undefined' ){
+	if( matches !== null && ckMatches.length === 2 ){
 		this._ck=matches[1];
 		return true;
 	}
@@ -85,24 +84,29 @@ GameClient.prototype._parseCk = function(content){
 	return false;
 };
 
-GameClient.prototype.checkin = function(){
-	//запрашиваем главное здание для обновления ck
+/**
+ * Checkin into world for update ck
+ *
+ * @returns boolean
+ */
+gameClient.prototype.checkin = function(){
 	var request = new XHR();
-	request.open('POST', 'http://' + this._url + '/ds/useraction.php?SIDIX=' + encodeURIComponent(this._sessid), false);
+	request.open('POST', this._baseUrl + '/ds/useraction.php?SIDIX=' + encodeURIComponent(this._sessid), false);
 	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 	request.send(encodePostParams({
 		ck: this._ck,
 		onLoad: '[type Function]',
-		xmldata: '<getbuildmenu c="124" />'
+		xmldata: '<getbuildmenu c="124" />' //main building
 	}));
-	
-	var content = request.responseText;
-	var res = this._parseCk(content);
+
+	var res = this._parseCk(request.responseText);
 	if( res !== true ){
-		console.log('Not parsed new ck: ' + content);
+		console.log('Not parsed new ck: ' + request.responseText);
 	}
 	return res;
 };
+
+
 function encodePostParams(params)
 {
 	var out = [];
@@ -114,7 +118,7 @@ function encodePostParams(params)
 
 exports.getClient = function(){
 	if(instance === null){
-		instance = new GameClient();
+		instance = new gameClient();
 	}
 	return instance;
 };
