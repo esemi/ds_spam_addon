@@ -47,6 +47,7 @@ exports.create = function()
 
 exports.initListeners = function()
 {
+	console.log('init widget listeners call');
 	//start spam button
 	myPanel.port.on("spamStart", function(options) {
 		console.log("spamStart button clicked");
@@ -60,7 +61,7 @@ function spamStartCallback(panel, client, options)
 	console.log('spam callback fire');
 
 	var res = client.init(TABS.activeTab.url);
-	if( res === false ){
+	if( res !== true ){
 		//@TODO print error
 		console.log('not init client');
 		console.log(TABS.activeTab.url);
@@ -84,8 +85,17 @@ function spamStartCallback(panel, client, options)
 	//@TODO send log messages to panel
 	console.log('start ' + options.countArmy + ' army create and send to ' + options.ring + '.' + options.compl + '.' + options.sota + ' by unit id ' + options.unitId);
 
+	var res = client.checkin();
+	if( res !== true ){
+		//@TODO print error
+		console.log('checkin failed');
+		return;
+	}
+
 	for( var i=1; i<=options.countArmy; i++ )
 	{
+		console.log(i);
+
 		//создали армию
 		client.createArmy(options.unitId);
 

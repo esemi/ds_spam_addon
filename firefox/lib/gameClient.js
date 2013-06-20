@@ -83,14 +83,19 @@ gameClient.prototype._parseCk = function(content){
 	return false;
 };
 
+gameClient.prototype._getActionUrl = function(){
+	return this._baseUrl + '/ds/useraction.php?SIDIX=' + encodeURIComponent(this._sessid);
+};
+
 /**
  * Checkin into world for update ck
  *
  * @returns boolean
  */
 gameClient.prototype.checkin = function(){
+	console.log(this._getActionUrl());
 	var request = new XHR();
-	request.open('POST', this._baseUrl + '/ds/useraction.php?SIDIX=' + encodeURIComponent(this._sessid), false);
+	request.open('POST', this._getActionUrl(), false);
 	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 	request.send(encodePostParams({
 		ck: this._ck,
