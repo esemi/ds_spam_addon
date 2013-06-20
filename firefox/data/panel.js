@@ -2,8 +2,11 @@
 	document.getElementById("spamStart").onclick = function() {
 		console.log('spamStart button fire');
 		self.port.emit("spamStart", {
-			"armyCount": 3,
-			"enemyAdr": '2.1.1'
+			countArmy:5,
+			ring: 3,
+			compl: 1,
+			sota: 1,
+			unitId: 2
 		});
 	};
 

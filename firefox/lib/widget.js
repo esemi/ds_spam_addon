@@ -57,6 +57,7 @@ exports.initListeners = function()
 
 function spamStartCallback(panel, client, options)
 {
+	console.log('spam callback fire');
 
 	var res = client.init(TABS.activeTab.url);
 	if( res === false ){
@@ -91,5 +92,4 @@ function spamStartCallback(panel, client, options)
 		//отправили армию
 
 	}
-}
-
+};

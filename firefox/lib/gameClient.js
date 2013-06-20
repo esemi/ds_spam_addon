@@ -70,7 +70,6 @@ gameClient.prototype.createArmy = function(unitId){
 		}
 	});
 
-
 	return true;*/
 };
 
