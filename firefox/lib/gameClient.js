@@ -26,9 +26,8 @@ gameClient.prototype.init = function(currentUrl){
 
 	this._sessid = null;
 	this._ck = null;
-	this._baseUrl = url.scheme + url.host;
+	this._baseUrl = url.scheme + '://' + url.host;
 
-	console.log(url.path);
 	if( /^\/ds\/index.php\?/.test(url.path) )
 	{
 		var ckMatches = /ck=([\d\w]{10})\&/.exec(url.path);
@@ -70,13 +69,29 @@ gameClient.prototype.createArmy = function(unitId){
 		}
 	});
 
+	var request = new XHR();
+	request.open('POST', this._getActionUrl(), false);
+	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	request.send(encodePostParams({
+		ck: this._ck,
+		onLoad: '[type Function]',
+		xmldata: '<getbuildmenu c="124" />' //main building
+	}));
+
+	console.log(request.responseText);
+	var res = this._parseCk(request.responseText);
+	if( res !== true ){
+		console.log('Not parsed new ck: ' + request.responseText);
+	}
+	return res;
+
 	return true;*/
 };
 
 gameClient.prototype._parseCk = function(content){
-	var matches = /\&ck=([\d\w]{10})\&loadkey=/i.exec(content);
-	if( matches !== null && ckMatches.length === 2 ){
-		this._ck=matches[1];
+	var ckMatches = /\&ck=([\d\w]{10})\&loadkey=/i.exec(content);
+	if( ckMatches !== null && ckMatches.length === 2 ){
+		this._ck = ckMatches[1];
 		return true;
 	}
 
@@ -93,7 +108,6 @@ gameClient.prototype._getActionUrl = function(){
  * @returns boolean
  */
 gameClient.prototype.checkin = function(){
-	console.log(this._getActionUrl());
 	var request = new XHR();
 	request.open('POST', this._getActionUrl(), false);
 	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -103,6 +117,7 @@ gameClient.prototype.checkin = function(){
 		xmldata: '<getbuildmenu c="124" />' //main building
 	}));
 
+	console.log(request.responseText);
 	var res = this._parseCk(request.responseText);
 	if( res !== true ){
 		console.log('Not parsed new ck: ' + request.responseText);
