@@ -13,6 +13,7 @@ var gameClient = function(){
 	this._ck = null;
 	this._baseUrl = null;
 	this._isInititated = false;
+	this._lastMessage = '';
 };
 
 /**
@@ -56,36 +57,39 @@ gameClient.prototype.init = function(currentUrl){
  * Create army from single unit
  *
  * @param int unitId Id unit for create spam army
- * @returns mixed True if success, string contains error if fail
+ * @param string army Army name for create
+ * @returns boolean
  */
-gameClient.prototype.createArmy = function(unitId){
-	/*var armyName = 'randomname13545';
-	var req = REQUEST.Request({
-		url : this._baseUrl + '/ds/useraction.php?SIDIX=' + this._sessid,
-		content: {
-			"ck": this._ck,
-			"onLoad": "[type Function]",
-			"xmldata": '<createarmy><armyname><![CDATA[' + armyName + ']></armyname><unit id="' + unitId + '" count="1"/></createarmy>'
-		}
+gameClient.prototype.createArmy = function(unitId, army){
+	var params = encodePostParams({
+		"ck": this._ck,
+		"onLoad": "[type Function]",
+		"xmldata": '<createarmy><armyname><![CDATA[' + army + ']]></armyname><unit id="' + unitId + '" count="1"/></createarmy>'
 	});
-
 	var request = new XHR();
 	request.open('POST', this._getActionUrl(), false);
 	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-	request.send(encodePostParams({
-		ck: this._ck,
-		onLoad: '[type Function]',
-		xmldata: '<getbuildmenu c="124" />' //main building
-	}));
+	request.send(params);
 
-	console.log(request.responseText);
 	var res = this._parseCk(request.responseText);
 	if( res !== true ){
 		console.log('Not parsed new ck: ' + request.responseText);
+		return false;
 	}
-	return res;
 
-	return true;*/
+	console.log(request.responseText);
+	var res = this._parseCreateArmyResponse(request.responseText);
+	if( res !== true )
+	{
+		console.log('Not parsed create army message: ' + request.responseText);
+		return false;
+	}
+
+	return true;
+};
+
+gameClient.prototype.getLastMessage = function(){
+	return this._lastMessage;
 };
 
 gameClient.prototype._parseCk = function(content){
@@ -94,8 +98,20 @@ gameClient.prototype._parseCk = function(content){
 		this._ck = ckMatches[1];
 		return true;
 	}
-
 	return false;
+};
+
+gameClient.prototype._parseCreateArmyResponse = function(content)
+{
+	var matches = /<sysmsg><m>{FONT FACE=.*}(.*)<\/m><\/sysmsg>/.exec(content);
+	if( matches !== null && matches.length === 2 )
+	{
+		this._lastMessage = matches[1];
+		return true;
+	}else{
+		this._lastMessage = '';
+		return false;
+	}
 };
 
 gameClient.prototype._getActionUrl = function(){
@@ -108,16 +124,16 @@ gameClient.prototype._getActionUrl = function(){
  * @returns boolean
  */
 gameClient.prototype.checkin = function(){
+	var params = encodePostParams({
+		ck: this._ck,
+		onLoad: '[type Function]',
+		xmldata: '<getbuildmenu c="124"/>'
+	});
 	var request = new XHR();
 	request.open('POST', this._getActionUrl(), false);
 	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-	request.send(encodePostParams({
-		ck: this._ck,
-		onLoad: '[type Function]',
-		xmldata: '<getbuildmenu c="124" />' //main building
-	}));
+	request.send(params);
 
-	console.log(request.responseText);
 	var res = this._parseCk(request.responseText);
 	if( res !== true ){
 		console.log('Not parsed new ck: ' + request.responseText);
@@ -130,7 +146,7 @@ function encodePostParams(params)
 {
 	var out = [];
 	for( var i in params ){
-		out.push(i + '=' + encodeURIComponent(params[i]));
+		out.push(i + '=' + encodeURIComponent(params[i]).replace('!', '%21'));
 	}
 	return out.join('&');
 }

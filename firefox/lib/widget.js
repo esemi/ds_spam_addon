@@ -92,14 +92,43 @@ function spamStartCallback(panel, client, options)
 		return;
 	}
 
+	var armyPrefix = randomString(10);
+	console.log("select army prefix " + armyPrefix);
+
 	for( var i=1; i<=options.countArmy; i++ )
 	{
-		console.log(i);
+		var armyName = armyPrefix.concat(i);
+		//@TODO send log messages to panel
+		console.log('create army ' + armyName);
 
 		//создали армию
-		client.createArmy(options.unitId);
+		var res = client.createArmy(options.unitId, armyName);
+		if(res !== true)
+		{
+			//@TODO send log messages to panel
+			console.log('fail create army');
+			break;
+		}
 
+		console.log(/была создана новая армия/.test(client.getLastMessage()));
+
+		if( ! /была создана новая армия/.test(client.getLastMessage()) )
+		{
+			//@TODO send log messages to panel
+			console.log('fail message from server (create army)');
+			break;
+		}
+		
 		//отправили армию
 
 	}
 };
+
+function randomString(length)
+{
+	var chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+	var result = '';
+	for (var i = length; i > 0; --i)
+		result += chars[Math.round(Math.random() * (chars.length - 1))];
+	return result;
+}
