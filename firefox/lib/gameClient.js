@@ -77,7 +77,7 @@ gameClient.prototype.createArmy = function(unitId, army){
 		return false;
 	}
 
-	console.log(request.responseText);
+	//console.log(request.responseText);
 	var res = this._parseCreateArmyResponse(request.responseText);
 	if( res !== true )
 	{
@@ -103,10 +103,11 @@ gameClient.prototype._parseCk = function(content){
 
 gameClient.prototype._parseCreateArmyResponse = function(content)
 {
-	var matches = /<sysmsg><m>{FONT FACE=.*}(.*)<\/m><\/sysmsg>/.exec(content);
+	var matches = /<sysmsg><m>(.*)<\/m><\/sysmsg>/.exec(content);
+
 	if( matches !== null && matches.length === 2 )
 	{
-		this._lastMessage = matches[1];
+		this._lastMessage = matches[1].replace(/\{([^}]*)\}/g, '');
 		return true;
 	}else{
 		this._lastMessage = '';

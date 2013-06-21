@@ -19,4 +19,10 @@
 	self.port.on("hide-panel", function(){
 
 	});
+
+	//добавляем сообщение в лог
+	self.port.on("add-log", function(message){
+		document.getElementById("log").innerHTML += message + '<br>';
+	});
+
 })();

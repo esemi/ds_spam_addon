@@ -17,8 +17,8 @@ exports.create = function()
 	console.log('create widget call');
 
 	myPanel = require("sdk/panel").Panel({
-		width:250,
-		height:200,
+		width:700,
+		height:400,
 		contentURL: self.data.url("panel.html"),
 		contentScriptFile: self.data.url('panel.js'),
 		contentScriptWhen: 'ready',
@@ -83,12 +83,15 @@ function spamStartCallback(panel, client, options)
 	}
 
 	//@TODO send log messages to panel
-	console.log('start ' + options.countArmy + ' army create and send to ' + options.ring + '.' + options.compl + '.' + options.sota + ' by unit id ' + options.unitId);
+	var mess = 'start ' + options.countArmy + ' army create and send to ' + options.ring + '.' + options.compl + '.' + options.sota + ' by unit id ' + options.unitId;
+	console.log(mess);
+	panel.port.emit('add-log', mess);
 
 	var res = client.checkin();
 	if( res !== true ){
 		//@TODO print error
 		console.log('checkin failed');
+		panel.port.emit('add-log', 'checkin failed');
 		return;
 	}
 
@@ -98,27 +101,31 @@ function spamStartCallback(panel, client, options)
 	for( var i=1; i<=options.countArmy; i++ )
 	{
 		var armyName = armyPrefix.concat(i);
-		//@TODO send log messages to panel
+
+		panel.port.emit('add-log', 'start create army ' + armyName);
 		console.log('create army ' + armyName);
 
 		//создали армию
 		var res = client.createArmy(options.unitId, armyName);
 		if(res !== true)
 		{
-			//@TODO send log messages to panel
+			panel.port.emit('add-log', 'fail create army');
 			console.log('fail create army');
 			break;
 		}
 
-		console.log(/была создана новая армия/.test(client.getLastMessage()));
-
+		console.log(client.getLastMessage());
+		console.log(client.getLastMessage().length);
+		console.log(decodeURIComponent(client.getLastMessage()));
+		panel.port.emit('add-log', 'test: ' + client.getLastMessage());
 		if( ! /была создана новая армия/.test(client.getLastMessage()) )
 		{
-			//@TODO send log messages to panel
+			panel.port.emit('add-log', 'fail message from server (create army)');
 			console.log('fail message from server (create army)');
 			break;
 		}
-		
+		panel.port.emit('add-log', 'army success created');
+
 		//отправили армию
 
 	}
