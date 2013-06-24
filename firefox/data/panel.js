@@ -2,9 +2,9 @@
 	document.getElementById("spamStart").onclick = function() {
 		console.log('spamStart button fire');
 		self.port.emit("spamStart", {
-			countArmy:5,
+			countArmy:150,
 			ring: 3,
-			compl: 1,
+			compl: 123,
 			sota: 1,
 			unitId: 3
 		});

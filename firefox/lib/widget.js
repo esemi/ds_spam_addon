@@ -4,6 +4,7 @@ var TABS = require("sdk/tabs");
 var NOTIFICATIONS = require("sdk/notifications");
 
 var myConfig = require("./config.js").config;
+var myLibs = require("./libs.js");
 var gameClient = require("./gameClient.js").getClient();
 
 var myWidget = null;
@@ -72,7 +73,7 @@ function spamStartCallback(panel, client, options)
 		return;
 	}
 
-	var armyPrefix = randomString(10);
+	var armyPrefix = myLibs.randomString(10);
 	var address = [options.ring, options.compl, options.sota].join('.');
 	var mess =
 			'start ' + options.countArmy +
@@ -146,7 +147,7 @@ function spamStartCallback(panel, client, options)
 		for( var i in armyIds )
 		{
 			console.log('send army ' + armyIds[i] + ' to ' + address);
-			panel.port.emit('add-log', 'start send army to ' + address);
+			panel.port.emit('add-log', 'start send army ' + armyIds[i] + ' to ' + address);
 
 			//отправили армию
 			var res = client.sendArmy(armyIds[i], address);
@@ -159,7 +160,7 @@ function spamStartCallback(panel, client, options)
 
 			console.log(client.getLastMessage());
 			panel.port.emit('add-log', 'server response: ' + client.getLastMessage());
-			if( ! /была\sсоздана\sновая\sармия/.test(client.getLastMessage()) )
+			if( ! /получила\sприказ\sатаковать\sсоту/.test(client.getLastMessage()) )
 			{
 				console.log('fail message from server (send army)');
 				panel.port.emit('add-log', 'fail message from server (send army)');
@@ -170,12 +171,3 @@ function spamStartCallback(panel, client, options)
 
 
 };
-
-function randomString(length)
-{
-	var chars = 'abcdefghijklmnopqrstuvwxyz';
-	var result = '';
-	for (var i = length; i > 0; --i)
-		result += chars[Math.round(Math.random() * (chars.length - 1))];
-	return result;
-}

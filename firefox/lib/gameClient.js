@@ -161,12 +161,12 @@ gameClient.prototype.createArmy = function(unitId, army){
 	return true;
 };
 
-/*
-gameClient.ptototype.sendArmy = function(){
+
+gameClient.prototype.sendArmy = function(armyId, addr){
 	var params = myLibs.encodePostParams({
 		"ck": this._ck,
 		"onLoad": "[type Function]",
-		"xmldata": '<createarmy><armyname><![CDATA[' + army + ']]></armyname><unit id="' + unitId + '" count="1"/></createarmy>'
+		"xmldata": '<attack res="ALL_RES" speed="150" destination="' + addr + '" id_army="' + armyId + '" />'
 	});
 	var request = new XHR();
 	request.open('POST', this._getActionUrl(), false);
@@ -180,16 +180,15 @@ gameClient.ptototype.sendArmy = function(){
 	}
 
 	//console.log(request.responseText);
-	var res = this._parseCreateArmyResponse(request.responseText);
+	var res = this._parseSendArmyResponse(request.responseText);
 	if( res !== true )
 	{
-		console.log('Not parsed create army message: ' + request.responseText);
+		console.log('Not parsed send army message: ' + request.responseText);
 		return false;
 	}
 
 	return true;
 };
-*/
 
 gameClient.prototype.getLastMessage = function(){
 	return this._lastMessage;
@@ -215,6 +214,19 @@ gameClient.prototype._parseCk = function(content){
 
 gameClient.prototype._parseCreateArmyResponse = function(content){
 	var matches = /<sysmsg><m>(.*)<\/m><\/sysmsg>/.exec(content);
+
+	if( matches !== null && matches.length === 2 )
+	{
+		this._lastMessage = matches[1].replace(/\{([^}]*)\}/g, '');
+		return true;
+	}else{
+		this._lastMessage = '';
+		return false;
+	}
+};
+
+gameClient.prototype._parseSendArmyResponse = function(content){
+	var matches = /<sysmsg><w>(.*)<\/w><\/sysmsg>/.exec(content);
 
 	if( matches !== null && matches.length === 2 )
 	{
