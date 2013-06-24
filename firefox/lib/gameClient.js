@@ -5,6 +5,7 @@ var XHR = require("sdk/net/xhr").XMLHttpRequest;
 var REQUEST = require("sdk/request");
 
 var myConfig = require("./config.js").config;
+var myLibs = require("./libs.js");
 
 var instance = null;
 
@@ -14,6 +15,10 @@ var gameClient = function(){
 	this._baseUrl = null;
 	this._isInititated = false;
 	this._lastMessage = '';
+	this._map = {
+		'armyBase': null, //26 code
+		'mainBuilding': 127
+	};
 };
 
 /**
@@ -54,6 +59,39 @@ gameClient.prototype.init = function(currentUrl){
 };
 
 /**
+ * Loading buildings map
+ *
+ * @returns boolean
+ */
+gameClient.prototype.loadBuildMap = function(){
+	var params = myLibs.encodePostParams({
+		ck: this._ck,
+		onLoad: '[type Function]',
+		xmldata: '<navigate cell="1" dest="HOME" />'
+	});
+	var request = new XHR();
+	request.open('POST', this._getActionUrl(), false);
+	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	request.send(params);
+
+	var res = this._parseCk(request.responseText);
+	if( res !== true ){
+		console.log('Not parsed new ck: ' + request.responseText);
+	}
+
+	//console.log(request.responseText);
+	var res = this._parseBuildMapResponse(request.responseText);
+	if( res !== true )
+	{
+		console.log('Not parsed build army response: ' + request.responseText);
+		return false;
+	}
+
+	return res;
+};
+
+
+/**
  * Create army from single unit
  *
  * @param int unitId Id unit for create spam army
@@ -61,7 +99,7 @@ gameClient.prototype.init = function(currentUrl){
  * @returns boolean
  */
 gameClient.prototype.createArmy = function(unitId, army){
-	var params = encodePostParams({
+	var params = myLibs.encodePostParams({
 		"ck": this._ck,
 		"onLoad": "[type Function]",
 		"xmldata": '<createarmy><armyname><![CDATA[' + army + ']]></armyname><unit id="' + unitId + '" count="1"/></createarmy>'
@@ -88,8 +126,17 @@ gameClient.prototype.createArmy = function(unitId, army){
 	return true;
 };
 
+
+/*gameClient.ptototype.sendArmy = function(){
+
+};
+*/
+
 gameClient.prototype.getLastMessage = function(){
 	return this._lastMessage;
+};
+gameClient.prototype.getArmyBuildId = function(){
+	return this._map.armyBase;
 };
 
 gameClient.prototype._parseCk = function(content){
@@ -101,8 +148,7 @@ gameClient.prototype._parseCk = function(content){
 	return false;
 };
 
-gameClient.prototype._parseCreateArmyResponse = function(content)
-{
+gameClient.prototype._parseCreateArmyResponse = function(content){
 	var matches = /<sysmsg><m>(.*)<\/m><\/sysmsg>/.exec(content);
 
 	if( matches !== null && matches.length === 2 )
@@ -115,42 +161,31 @@ gameClient.prototype._parseCreateArmyResponse = function(content)
 	}
 };
 
+gameClient.prototype._parseBuildMapResponse = function(content){
+	var matches = /<build>([\d\^]*)<\/build>/.exec(content);
+
+	if( matches === null || matches.length !== 2 ){
+		return false;
+	}
+
+	var temp = matches[1].split('^^');
+	for(var i in temp)
+	{
+		var t = temp[i].split('^');
+		if( t.length < 3 )
+			continue;
+
+		if( t[2] === '26' ) //army base
+			this._map.armyBase = parseInt(t[1]) + 1;
+	}
+
+	return true;
+};
+
 gameClient.prototype._getActionUrl = function(){
 	return this._baseUrl + '/ds/useraction.php?SIDIX=' + encodeURIComponent(this._sessid);
 };
 
-/**
- * Checkin into world for update ck
- *
- * @returns boolean
- */
-gameClient.prototype.checkin = function(){
-	var params = encodePostParams({
-		ck: this._ck,
-		onLoad: '[type Function]',
-		xmldata: '<getbuildmenu c="124"/>'
-	});
-	var request = new XHR();
-	request.open('POST', this._getActionUrl(), false);
-	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-	request.send(params);
-
-	var res = this._parseCk(request.responseText);
-	if( res !== true ){
-		console.log('Not parsed new ck: ' + request.responseText);
-	}
-	return res;
-};
-
-
-function encodePostParams(params)
-{
-	var out = [];
-	for( var i in params ){
-		out.push(i + '=' + encodeURIComponent(params[i]).replace('!', '%21'));
-	}
-	return out.join('&');
-}
 
 exports.getClient = function(){
 	if(instance === null){

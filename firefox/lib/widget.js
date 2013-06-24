@@ -58,16 +58,6 @@ exports.initListeners = function()
 
 function spamStartCallback(panel, client, options)
 {
-	console.log('spam callback fire');
-
-	var res = client.init(TABS.activeTab.url);
-	if( res !== true ){
-		//@TODO print error
-		console.log('not init client');
-		console.log(TABS.activeTab.url);
-		return;
-	}
-
 	//check options
 	var intRegExp = /\d+/;
 	if(
@@ -77,33 +67,46 @@ function spamStartCallback(panel, client, options)
 		typeof options.sota === 'undefined' || !intRegExp.test(options.sota) ||
 		typeof options.unitId === 'undefined' || !intRegExp.test(options.unitId)
 	){
-		//@TODO print error
 		console.log('invalid options');
-		return;
-	}
-
-	//@TODO send log messages to panel
-	var mess = 'start ' + options.countArmy + ' army create and send to ' + options.ring + '.' + options.compl + '.' + options.sota + ' by unit id ' + options.unitId;
-	console.log(mess);
-	panel.port.emit('add-log', mess);
-
-	var res = client.checkin();
-	if( res !== true ){
-		//@TODO print error
-		console.log('checkin failed');
-		panel.port.emit('add-log', 'checkin failed');
+		panel.port.emit('add-log', 'invalid options');
 		return;
 	}
 
 	var armyPrefix = randomString(10);
-	console.log("select army prefix " + armyPrefix);
+	var address = [options.ring, options.compl, options.sota].join('.');
+	var mess =
+			'start ' + options.countArmy +
+			' army create and send to ' + address +
+			' by unit id ' + options.unitId +
+			' army prefix - "' + armyPrefix + '"';
+	console.log(mess);
+	panel.port.emit('add-log', mess);
 
+	var res = client.loadBuildMap();
+	if( res !== true ){
+		console.log('loading build map failed');
+		panel.port.emit('add-log', 'loading build map failed');
+		return;
+	}
+
+	var armyBaseId = client.getArmyBuildId();
+	console.log("army base id " + armyBaseId);
+	if( armyBaseId === null )
+	{
+		console.log('army base build id not found');
+		panel.port.emit('add-log', 'army base build id not found');
+		return;
+	}
+
+	//@TODO убиваем отображение соты, дабы не нащёлкали лишнего пока идёт отправка
+
+	var createdArmy = [];
 	for( var i=1; i<=options.countArmy; i++ )
 	{
 		var armyName = armyPrefix.concat(i);
 
-		panel.port.emit('add-log', 'start create army ' + armyName);
 		console.log('create army ' + armyName);
+		panel.port.emit('add-log', 'start create army ' + armyName);
 
 		//создали армию
 		var res = client.createArmy(options.unitId, armyName);
@@ -115,25 +118,52 @@ function spamStartCallback(panel, client, options)
 		}
 
 		console.log(client.getLastMessage());
-		console.log(client.getLastMessage().length);
-		console.log(decodeURIComponent(client.getLastMessage()));
-		panel.port.emit('add-log', 'test: ' + client.getLastMessage());
-		if( ! /была создана новая армия/.test(client.getLastMessage()) )
+		panel.port.emit('add-log', 'server response: ' + client.getLastMessage());
+		if( ! /была\sсоздана\sновая\sармия/.test(client.getLastMessage()) )
 		{
-			panel.port.emit('add-log', 'fail message from server (create army)');
 			console.log('fail message from server (create army)');
+			panel.port.emit('add-log', 'fail message from server (create army)');
 			break;
 		}
-		panel.port.emit('add-log', 'army success created');
 
-		//отправили армию
-
+		createdArmy.push(armyName);
 	}
+
+	if( createdArmy.length > 0)
+	{
+		console.log('created ' + createdArmy.length + ' army ');
+		panel.port.emit('add-log', 'start send army to ' + address);
+		for( var i in createdArmy )
+		{
+			console.log('send army to ' + address);
+			panel.port.emit('add-log', 'start send army to ' + address);
+
+			//отправили армию
+			var res = client.sendArmy(armyName, address);
+			if(res !== true)
+			{
+				console.log('fail send army');
+				panel.port.emit('add-log', 'fail send army');
+				break;
+			}
+
+			console.log(client.getLastMessage());
+			panel.port.emit('add-log', 'server response: ' + client.getLastMessage());
+			if( ! /была\sсоздана\sновая\sармия/.test(client.getLastMessage()) )
+			{
+				console.log('fail message from server (send army)');
+				panel.port.emit('add-log', 'fail message from server (send army)');
+				break;
+			}
+		}
+	}
+
+
 };
 
 function randomString(length)
 {
-	var chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+	var chars = 'abcdefghijklmnopqrstuvwxyz';
 	var result = '';
 	for (var i = length; i > 0; --i)
 		result += chars[Math.round(Math.random() * (chars.length - 1))];
