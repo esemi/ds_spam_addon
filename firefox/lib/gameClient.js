@@ -273,9 +273,8 @@ gameClient.prototype._parseArmyOverviewResponse = function(content, armyNames){
 	var result = [];
 	for(var i in armyNames)
 	{
-		var re = new RegExp('<army id_army="(\d+)" armyname="' + armyNames[i] + '"');
+		var re = new RegExp('<army\\sid_army="(\\d+)"\\sarmyname="' + armyNames[i] + '"');
 		var match = re.exec(armyContent);
-		console.log('army id ' + armyNames[i] + ' ' + match);
 		if( match === null || match.length !== 2 ){
 			console.log('not found army id ' + armyNames[i] + ' ' + match);
 			continue;

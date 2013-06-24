@@ -88,6 +88,7 @@ function spamStartCallback(panel, client, options)
 		panel.port.emit('add-log', 'loading build map failed');
 		return;
 	}
+	panel.port.emit('add-log', 'loading build map success');
 
 	var armyBaseId = client.getArmyBuildId();
 	console.log("army base id " + armyBaseId);
@@ -97,6 +98,7 @@ function spamStartCallback(panel, client, options)
 		panel.port.emit('add-log', 'army base build id not found');
 		return;
 	}
+	panel.port.emit('add-log', 'army base build id found success');
 
 	//@TODO убиваем отображение соты, дабы не нащёлкали лишнего пока идёт отправка
 
@@ -131,7 +133,7 @@ function spamStartCallback(panel, client, options)
 
 	if( createdArmy.length > 0)
 	{
-		console.log('created ' + createdArmy.length + ' armies ');
+		console.log('created ' + createdArmy.length + ' army');
 		var armyIds = client.loadArmyOverview(createdArmy);
 		if(armyIds === false)
 		{
@@ -139,8 +141,6 @@ function spamStartCallback(panel, client, options)
 			panel.port.emit('add-log', 'fail loading army ids');
 			return;
 		}
-		console.log(armyIds);
-		return;
 
 		panel.port.emit('add-log', 'start send army to ' + address);
 		for( var i in armyIds )
