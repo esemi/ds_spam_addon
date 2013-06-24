@@ -15,6 +15,8 @@ var gameClient = function(){
 	this._baseUrl = null;
 	this._isInititated = false;
 	this._lastMessage = '';
+	this._minArmySpeed = 50;
+	this._maxArmySpeed = 150;
 	this._map = {
 		'armyBase': null, //26 code
 		'mainBuilding': 127
@@ -77,6 +79,7 @@ gameClient.prototype.loadBuildMap = function(){
 	var res = this._parseCk(request.responseText);
 	if( res !== true ){
 		console.log('Not parsed new ck: ' + request.responseText);
+		return false;
 	}
 
 	//console.log(request.responseText);
@@ -90,6 +93,38 @@ gameClient.prototype.loadBuildMap = function(){
 	return res;
 };
 
+/**
+ * Loading army base buildMenu
+ *
+ * @param array armyNames Array of army names
+ * @returns mixed Array of army ids or False if failed
+ */
+gameClient.prototype.loadArmyOverview = function(armyNames)
+{
+	var params = myLibs.encodePostParams({
+		ck: this._ck,
+		onLoad: '[type Function]',
+		xmldata: '<getbuildmenu c="' + this.getArmyBuildId() + '" tab="PN_ArmyOverview" />'
+	});
+	var request = new XHR();
+	request.open('POST', this._getActionUrl(), false);
+	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	request.send(params);
+
+	var res = this._parseCk(request.responseText);
+	if( res !== true ){
+		console.log('Not parsed new ck: ' + request.responseText);
+		return false;
+	}
+
+	var res = this._parseArmyOverviewResponse(request.responseText, armyNames);
+	if( res === false || res.length !== armyNames.length )
+	{
+		console.log(res);
+		console.log('Not parsed army overview response: ' + request.responseText + ' length ' + res.length + ' vs ' + armyNames.length);
+	}
+	return res;
+};
 
 /**
  * Create army from single unit
@@ -126,9 +161,33 @@ gameClient.prototype.createArmy = function(unitId, army){
 	return true;
 };
 
+/*
+gameClient.ptototype.sendArmy = function(){
+	var params = myLibs.encodePostParams({
+		"ck": this._ck,
+		"onLoad": "[type Function]",
+		"xmldata": '<createarmy><armyname><![CDATA[' + army + ']]></armyname><unit id="' + unitId + '" count="1"/></createarmy>'
+	});
+	var request = new XHR();
+	request.open('POST', this._getActionUrl(), false);
+	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	request.send(params);
 
-/*gameClient.ptototype.sendArmy = function(){
+	var res = this._parseCk(request.responseText);
+	if( res !== true ){
+		console.log('Not parsed new ck: ' + request.responseText);
+		return false;
+	}
 
+	//console.log(request.responseText);
+	var res = this._parseCreateArmyResponse(request.responseText);
+	if( res !== true )
+	{
+		console.log('Not parsed create army message: ' + request.responseText);
+		return false;
+	}
+
+	return true;
 };
 */
 
@@ -137,6 +196,12 @@ gameClient.prototype.getLastMessage = function(){
 };
 gameClient.prototype.getArmyBuildId = function(){
 	return this._map.armyBase;
+};
+gameClient.prototype.getMinArmySpeed = function(){
+	return this._minArmySpeed;
+};
+gameClient.prototype.getMaxArmySpeed = function(){
+	return this._maxArmySpeed;
 };
 
 gameClient.prototype._parseCk = function(content){
@@ -180,6 +245,45 @@ gameClient.prototype._parseBuildMapResponse = function(content){
 	}
 
 	return true;
+};
+
+gameClient.prototype._parseArmyOverviewResponse = function(content, armyNames){
+	var matches = /<armyoverview(.*)<\/armyoverview>/.exec(content);
+	if( matches === null || matches.length !== 2 ){
+		console.log('not parsed overview content' + matches);
+		return false;
+	}
+
+	var armyContent = matches[1];
+
+	var minSpeedMatches = /minspeed="(\d+)"/.exec(armyContent);
+	if( minSpeedMatches === null || minSpeedMatches.length !== 2 ){
+		console.log('not parsed min speed' + minSpeedMatches);
+		return false;
+	}
+	this._minArmySpeed = parseInt(minSpeedMatches[1]);
+
+	var maxSpeedMatches = /maxspeed="(\d+)"/.exec(armyContent);
+	if( maxSpeedMatches === null || maxSpeedMatches.length !== 2 ){
+		console.log('not parsed max speed' + maxSpeedMatches);
+		return false;
+	}
+	this._maxArmySpeed = parseInt(maxSpeedMatches[1]);
+
+	var result = [];
+	for(var i in armyNames)
+	{
+		var re = new RegExp('<army id_army="(\d+)" armyname="' + armyNames[i] + '"');
+		var match = re.exec(armyContent);
+		console.log('army id ' + armyNames[i] + ' ' + match);
+		if( match === null || match.length !== 2 ){
+			console.log('not found army id ' + armyNames[i] + ' ' + match);
+			continue;
+		}
+		result.push(match[1]);
+	}
+
+	return result;
 };
 
 gameClient.prototype._getActionUrl = function(){

@@ -131,15 +131,25 @@ function spamStartCallback(panel, client, options)
 
 	if( createdArmy.length > 0)
 	{
-		console.log('created ' + createdArmy.length + ' army ');
-		panel.port.emit('add-log', 'start send army to ' + address);
-		for( var i in createdArmy )
+		console.log('created ' + createdArmy.length + ' armies ');
+		var armyIds = client.loadArmyOverview(createdArmy);
+		if(armyIds === false)
 		{
-			console.log('send army to ' + address);
+			console.log('fail loading army ids');
+			panel.port.emit('add-log', 'fail loading army ids');
+			return;
+		}
+		console.log(armyIds);
+		return;
+
+		panel.port.emit('add-log', 'start send army to ' + address);
+		for( var i in armyIds )
+		{
+			console.log('send army ' + armyIds[i] + ' to ' + address);
 			panel.port.emit('add-log', 'start send army to ' + address);
 
 			//отправили армию
-			var res = client.sendArmy(armyName, address);
+			var res = client.sendArmy(armyIds[i], address);
 			if(res !== true)
 			{
 				console.log('fail send army');
