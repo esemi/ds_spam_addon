@@ -1,5 +1,9 @@
+//@TODO replace id to js-class
+//@TODO check options before send
+//@TODO auto scroll log textarea
+
 (function(){
-	document.getElementById("spamStart").onclick = function() {
+	/*document.getElementById("spamStart").onclick = function() {
 		console.log('spamStart button fire');
 		self.port.emit("spamStart", {
 			countArmy:150,
@@ -9,15 +13,15 @@
 			unitId: 3
 		});
 	};
-
+*/
 	//открываем управляющую панель при событии
-	self.port.on("show-panel", function(options){
-		console.log(options.armyLimit);
+	self.port.on("show-panel", function(){
+		console.log('show panel port on');
 	});
 
 	//скрываем управляющую панель при событии
 	self.port.on("hide-panel", function(){
-
+		console.log('hide panel port on');
 	});
 
 	//добавляем сообщение в лог

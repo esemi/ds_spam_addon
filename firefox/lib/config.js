@@ -1,5 +1,1 @@
-exports.config = {
-	"panelOptions": {
-		armyLimit: 150
-	}
-};
+exports.config = {};

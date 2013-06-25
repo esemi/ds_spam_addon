@@ -25,12 +25,20 @@ exports.create = function()
 		contentScriptWhen: 'ready',
 		onShow: function() {
 			var url = TABS.activeTab.url;
-			console.log(url);
 
 			var res = gameClient.init(url);
 			if( res ){
 				console.log('show panel');
-				myPanel.port.emit('show-panel',myConfig.panelOptions);
+				var worker = TABS.activeTab.attach({
+					contentScriptFile: self.data.url('game-adapter.js')
+				});
+				worker.port.emit("getCk");
+				worker.port.on("gotCk", function(ck) {
+					console.log(ck);
+					//gameClient.setCk(elem);
+					myPanel.port.emit('show-panel');
+				});
+
 			}else{
 				console.log('hide panel');
 				myPanel.port.emit('hide-panel');
@@ -49,7 +57,7 @@ exports.create = function()
 exports.initListeners = function()
 {
 	console.log('init widget listeners call');
-	//start spam button
+
 	myPanel.port.on("spamStart", function(options) {
 		console.log("spamStart button clicked");
 		spamStartCallback(myPanel, gameClient, options);
@@ -102,6 +110,9 @@ function spamStartCallback(panel, client, options)
 	panel.port.emit('add-log', 'army base build id found success');
 
 	//@TODO убиваем отображение соты, дабы не нащёлкали лишнего пока идёт отправка
+	TABS.attach({
+		contentScriptFile: self.data.url('page-lock.js')
+	});
 
 	var createdArmy = [];
 	for( var i=1; i<=options.countArmy; i++ )
