@@ -13,7 +13,7 @@
 		</div>
 
 		<div>
-			<input name="countArmy" value="0" type="number" placeholder="количество армий" max="300" min="1"/>
+			<input name="countArmy" value="" type="number" placeholder="количество армий" max="300" min="1"/>
 			<br>
 			<select name="unitId" >
 				<option value="3">солдат</option>
@@ -30,7 +30,7 @@
 				<option value="3">псолеон</option>
 				<option value="4">мельсион</option>
 			</select>
-			<input name="compl" value="1" type="number" placeholder="комплекс" max="2000" min="1"/>
+			<input name="compl" value="" type="number" placeholder="комплекс" max="2000" min="1"/>
 			<select name="sota" >
 				<option value="1">1</option>
 				<option value="2">2</option>
@@ -41,10 +41,10 @@
 			</select>
 		</div>
 
-		<button name="spamStart" value="start" class="js-spam-start">пуск!</button>
+		<button name="spamStart" value="start" id="spamStart" class="js-spam-start">пуск!</button>
 
 		<div>
-			<textarea rows="30" cols="200" class="js-log"></textarea>
+			<textarea rows="30" cols="200" id='log' class="js-log"></textarea>
 		</div>
 	</body>
 

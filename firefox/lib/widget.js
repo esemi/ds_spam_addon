@@ -2,6 +2,7 @@ var self = require("sdk/self");
 var WIDGET = require("sdk/widget");
 var TABS = require("sdk/tabs");
 var NOTIFICATIONS = require("sdk/notifications");
+var EVENTS = require('sdk/event/core');
 
 var myConfig = require("./config.js").config;
 var myLibs = require("./libs.js");
@@ -51,10 +52,9 @@ exports.initListeners = function()
 
 	var callback = new spamCallback(myPanel, gameClient);
 	myPanel.port.on("spamStart", function(options) {
-		console.log("spamStart button clicked");
+		console.log("spamStart event fire");
 		callback.start(options);
 	});
-
 };
 
 var spamCallback = function(panel, client){
@@ -63,6 +63,11 @@ var spamCallback = function(panel, client){
 	this._opt;
 	this._armyPrefix;
 	this._address;
+
+	EVENTS.on(this._client, "ckChaged", function() {
+		console.log('ckChaged event fire');
+	});
+
 };
 
 spamCallback.prototype.log = function(message){
@@ -70,6 +75,12 @@ spamCallback.prototype.log = function(message){
 };
 
 spamCallback.prototype.start = function(options){
+	if( !this._client.isInitiated() )
+	{
+		console.log('client not initiated');
+		this.log('client not initiated');
+		return;
+	}
 
 	//check options
 	var intRegExp = /\d+/;
@@ -128,7 +139,6 @@ spamCallback.prototype.createArmy = function(){
 		var armyName = this._armyPrefix.concat(i);
 
 		console.log('create army ' + armyName);
-		this.log('start create army ' + armyName);
 
 		//создали армию
 		var res = this._client.createArmy(this._opt.unitId, armyName);
@@ -139,7 +149,7 @@ spamCallback.prototype.createArmy = function(){
 			break;
 		}
 
-		console.log(client.getLastMessage());
+		console.log(this._client.getLastMessage());
 		this.log('server response: ' + this._client.getLastMessage());
 		if( ! /была\sсоздана\sновая\sармия/.test(this._client.getLastMessage()) )
 		{
@@ -170,7 +180,6 @@ spamCallback.prototype.sendArmy = function(armyNames){
 	for( var i in armyIds )
 	{
 		console.log('start send army ' + armyIds[i]);
-		this.log('start send army ' + armyIds[i]);
 
 		//отправили армию
 		var res = this._client.sendArmy(armyIds[i], this._address);
@@ -181,7 +190,7 @@ spamCallback.prototype.sendArmy = function(armyNames){
 			break;
 		}
 
-		console.log(client.getLastMessage());
+		console.log(this._client.getLastMessage());
 		this.log('server response: ' + this._client.getLastMessage());
 		if( ! /получила\sприказ\sатаковать\sсоту/.test(this._client.getLastMessage()) )
 		{
@@ -190,6 +199,4 @@ spamCallback.prototype.sendArmy = function(armyNames){
 			break;
 		}
 	}
-
-	this.log('end work');
 };

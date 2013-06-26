@@ -3,6 +3,7 @@ var TABS = require("sdk/tabs");
 var URL_PARSER = require("sdk/url").URL;
 var XHR = require("sdk/net/xhr").XMLHttpRequest;
 var REQUEST = require("sdk/request");
+var EVENTS = require('sdk/event/core');
 
 var myConfig = require("./config.js").config;
 var myLibs = require("./libs.js");
@@ -161,7 +162,13 @@ gameClient.prototype.createArmy = function(unitId, army){
 	return true;
 };
 
-
+/**
+ * Send army to address
+ *
+ * @param int armyId
+ * @param string addr Army destination in format %d.%d.%d
+ * @returns boolean
+ */
 gameClient.prototype.sendArmy = function(armyId, addr){
 	var params = myLibs.encodePostParams({
 		"ck": this._ck,
@@ -202,11 +209,16 @@ gameClient.prototype.getMinArmySpeed = function(){
 gameClient.prototype.getMaxArmySpeed = function(){
 	return this._maxArmySpeed;
 };
+gameClient.prototype.isInitiated = function(){
+	return this._isInititated;
+};
+
 
 gameClient.prototype._parseCk = function(content){
 	var ckMatches = /\&ck=([\d\w]{10})\&loadkey=/i.exec(content);
 	if( ckMatches !== null && ckMatches.length === 2 ){
 		this._ck = ckMatches[1];
+		EVENTS.emit(this, 'ckChaged');
 		return true;
 	}
 	return false;

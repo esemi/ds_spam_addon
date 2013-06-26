@@ -3,7 +3,7 @@
 //@TODO auto scroll log textarea
 
 (function(){
-	/*document.getElementById("spamStart").onclick = function() {
+	document.getElementById("spamStart").onclick = function() {
 		console.log('spamStart button fire');
 		self.port.emit("spamStart", {
 			countArmy:150,
@@ -13,7 +13,7 @@
 			unitId: 3
 		});
 	};
-*/
+
 	//открываем управляющую панель при событии
 	self.port.on("show-panel", function(){
 		console.log('show panel port on');
@@ -26,7 +26,8 @@
 
 	//добавляем сообщение в лог
 	self.port.on("add-log", function(message){
-		document.getElementById("log").innerHTML += message + '<br>';
+		var d = new Date();
+		document.getElementById("log").innerHTML += d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ': ' + message + "\n";
 	});
 
 })();
