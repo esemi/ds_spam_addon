@@ -29,16 +29,7 @@ exports.create = function()
 			var res = gameClient.init(url);
 			if( res ){
 				console.log('show panel');
-				var worker = TABS.activeTab.attach({
-					contentScriptFile: self.data.url('game-adapter.js')
-				});
-				worker.port.emit("getCk");
-				worker.port.on("gotCk", function(ck) {
-					console.log(ck);
-					//gameClient.setCk(elem);
-					myPanel.port.emit('show-panel');
-				});
-
+				myPanel.port.emit('show-panel');
 			}else{
 				console.log('hide panel');
 				myPanel.port.emit('hide-panel');
@@ -58,15 +49,28 @@ exports.initListeners = function()
 {
 	console.log('init widget listeners call');
 
+	var callback = new spamCallback(myPanel, gameClient);
 	myPanel.port.on("spamStart", function(options) {
 		console.log("spamStart button clicked");
-		spamStartCallback(myPanel, gameClient, options);
+		callback.start(options);
 	});
 
 };
 
-function spamStartCallback(panel, client, options)
-{
+var spamCallback = function(panel, client){
+	this._panel = panel;
+	this._client = client;
+	this._opt;
+	this._armyPrefix;
+	this._address;
+};
+
+spamCallback.prototype.log = function(message){
+	this._panel.port.emit('add-log', message);
+};
+
+spamCallback.prototype.start = function(options){
+
 	//check options
 	var intRegExp = /\d+/;
 	if(
@@ -77,66 +81,70 @@ function spamStartCallback(panel, client, options)
 		typeof options.unitId === 'undefined' || !intRegExp.test(options.unitId)
 	){
 		console.log('invalid options');
-		panel.port.emit('add-log', 'invalid options');
+		this.log('invalid options');
 		return;
 	}
+	this._opt = options;
 
-	var armyPrefix = myLibs.randomString(10);
-	var address = [options.ring, options.compl, options.sota].join('.');
+	//generate army name
+	this._armyPrefix = myLibs.randomString(10);
+	this._address = [this._opt.ring, this._opt.compl, this._opt.sota].join('.');
 	var mess =
-			'start ' + options.countArmy +
-			' army create and send to ' + address +
-			' by unit id ' + options.unitId +
-			' army prefix - "' + armyPrefix + '"';
+			'start ' + this._opt.countArmy +
+			' army create and send to ' + this._address +
+			' by unit id ' + this._opt.unitId +
+			' army prefix - "' + this._armyPrefix + '"';
 	console.log(mess);
-	panel.port.emit('add-log', mess);
+	this.log(mess);
 
-	var res = client.loadBuildMap();
+	this.findArmyBase();
+};
+
+spamCallback.prototype.findArmyBase = function(){
+	var res = this._client.loadBuildMap();
 	if( res !== true ){
 		console.log('loading build map failed');
-		panel.port.emit('add-log', 'loading build map failed');
+		this.log('loading build map failed');
 		return;
 	}
-	panel.port.emit('add-log', 'loading build map success');
+	this.log('loading build map success');
 
-	var armyBaseId = client.getArmyBuildId();
-	console.log("army base id " + armyBaseId);
-	if( armyBaseId === null )
+	var res = this._client.getArmyBuildId();
+	if( res === null )
 	{
 		console.log('army base build id not found');
-		panel.port.emit('add-log', 'army base build id not found');
+		this.log('army base build id not found');
 		return;
 	}
-	panel.port.emit('add-log', 'army base build id found success');
+	this.log('army base build id found success ' + res);
 
-	//@TODO убиваем отображение соты, дабы не нащёлкали лишнего пока идёт отправка
-	TABS.attach({
-		contentScriptFile: self.data.url('page-lock.js')
-	});
+	this.createArmy();
+};
 
+spamCallback.prototype.createArmy = function(){
 	var createdArmy = [];
-	for( var i=1; i<=options.countArmy; i++ )
+	for( var i=1; i<=this._opt.countArmy; i++ )
 	{
-		var armyName = armyPrefix.concat(i);
+		var armyName = this._armyPrefix.concat(i);
 
 		console.log('create army ' + armyName);
-		panel.port.emit('add-log', 'start create army ' + armyName);
+		this.log('start create army ' + armyName);
 
 		//создали армию
-		var res = client.createArmy(options.unitId, armyName);
+		var res = this._client.createArmy(this._opt.unitId, armyName);
 		if(res !== true)
 		{
-			panel.port.emit('add-log', 'fail create army');
 			console.log('fail create army');
+			this.log('fail create army');
 			break;
 		}
 
 		console.log(client.getLastMessage());
-		panel.port.emit('add-log', 'server response: ' + client.getLastMessage());
-		if( ! /была\sсоздана\sновая\sармия/.test(client.getLastMessage()) )
+		this.log('server response: ' + this._client.getLastMessage());
+		if( ! /была\sсоздана\sновая\sармия/.test(this._client.getLastMessage()) )
 		{
 			console.log('fail message from server (create army)');
-			panel.port.emit('add-log', 'fail message from server (create army)');
+			this.log('fail message from server (create army)');
 			break;
 		}
 
@@ -145,40 +153,43 @@ function spamStartCallback(panel, client, options)
 
 	if( createdArmy.length > 0)
 	{
-		console.log('created ' + createdArmy.length + ' army');
-		var armyIds = client.loadArmyOverview(createdArmy);
-		if(armyIds === false)
+		this.sendArmy(createdArmy);
+	}
+};
+
+spamCallback.prototype.sendArmy = function(armyNames){
+	console.log('created ' + armyNames.length + ' army');
+	var armyIds = this._client.loadArmyOverview(armyNames);
+	if(armyIds === false)
+	{
+		console.log('fail loading army ids');
+		this.log('fail loading army ids');
+		return;
+	}
+
+	for( var i in armyIds )
+	{
+		console.log('start send army ' + armyIds[i]);
+		this.log('start send army ' + armyIds[i]);
+
+		//отправили армию
+		var res = this._client.sendArmy(armyIds[i], this._address);
+		if(res !== true)
 		{
-			console.log('fail loading army ids');
-			panel.port.emit('add-log', 'fail loading army ids');
-			return;
+			console.log('fail send army');
+			this.log('fail send army');
+			break;
 		}
 
-		panel.port.emit('add-log', 'start send army to ' + address);
-		for( var i in armyIds )
+		console.log(client.getLastMessage());
+		this.log('server response: ' + this._client.getLastMessage());
+		if( ! /получила\sприказ\sатаковать\sсоту/.test(this._client.getLastMessage()) )
 		{
-			console.log('send army ' + armyIds[i] + ' to ' + address);
-			panel.port.emit('add-log', 'start send army ' + armyIds[i] + ' to ' + address);
-
-			//отправили армию
-			var res = client.sendArmy(armyIds[i], address);
-			if(res !== true)
-			{
-				console.log('fail send army');
-				panel.port.emit('add-log', 'fail send army');
-				break;
-			}
-
-			console.log(client.getLastMessage());
-			panel.port.emit('add-log', 'server response: ' + client.getLastMessage());
-			if( ! /получила\sприказ\sатаковать\sсоту/.test(client.getLastMessage()) )
-			{
-				console.log('fail message from server (send army)');
-				panel.port.emit('add-log', 'fail message from server (send army)');
-				break;
-			}
+			console.log('fail message from server (send army)');
+			this.log('fail message from server (send army)');
+			break;
 		}
 	}
 
-
+	this.log('end work');
 };
