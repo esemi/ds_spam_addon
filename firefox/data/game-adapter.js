@@ -1,27 +1,8 @@
-var isLoaded = (document.readyState === 'complete');
-self.isInited = false;
+console.log(document.readyState);
+console.log(document.boby.innerHTML);
 
-if( !isLoaded )
-{
-	document.addEventListener("DOMContentLoaded", function(event){
-		console.log('content loaded fire');
-		init();
-	}, false);
-}else{
-	console.log('first init');
-	init();
-}
-
-
-function init(){
-	if( self.isInited )
-		return;
-
-	self.isInited = true;
-	self.port.on("getCk", function() {
-		console.log(document.readyState);
-		console.log(document.getElementsByTagName('BODY'));
-		console.log(document.getElementsByTagName('BODY').innerHtml);
-		self.port.emit("gotCk", 'dfsdfsdf');
-	});
-};
+self.port.on("getCk", function() {
+	console.log(document.readyState);
+	console.log(document.boby.innerHTML);
+	self.port.emit("gotCk", 'dfsdfsdf');
+});

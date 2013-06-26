@@ -27,10 +27,18 @@ exports.create = function()
 		onShow: function() {
 			var url = TABS.activeTab.url;
 
+
 			var res = gameClient.init(url);
 			if( res ){
 				console.log('show panel');
+
+				TABS.activeTab.attach({
+					contentScriptFile: self.data.url('game-adapter.js')
+				});
+				
 				myPanel.port.emit('show-panel');
+
+
 			}else{
 				console.log('hide panel');
 				myPanel.port.emit('hide-panel');
@@ -233,7 +241,6 @@ spamCallback.prototype.sendArmy = function(armyNames){
 				currentSeriesCount = 1;
 				speed = speed - this._opt.delay;
 			}
-
 		}
 
 		if(speed < this._client.getMinArmySpeed())
