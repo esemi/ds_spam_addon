@@ -207,13 +207,42 @@ spamCallback.prototype.sendArmy = function(armyNames){
 		return;
 	}
 
-	this._address = [this._opt.ring, this._opt.compl, this._opt.sota].join('.');
+	var address = [this._opt.ring, this._opt.compl, this._opt.sota].join('.');
+	var mess = 'start send '
+			+ armyIds.length
+			+ ' army to '
+			+ address
+			+ ' with delay '
+			+ this._opt.delay
+			+ ' and '
+			+ this._opt.seriesArmyCount
+			+ ' army in series';
+	console.log(mess);
+	this.log(mess);
+
+	//calculate speed by delay and seriesArmyCount params
+	var speed = this._client.getMaxArmySpeed();
+	var currentSeriesCount = 0;
 	for( var i in armyIds )
 	{
-		console.log('start send army ' + armyIds[i]);
+		if( this._opt.delay > 0 && speed > this._client.getMinArmySpeed() )
+		{
+			currentSeriesCount+=1;
+			if( currentSeriesCount > this._opt.seriesArmyCount )
+			{
+				currentSeriesCount = 1;
+				speed = speed - this._opt.delay;
+			}
+
+		}
+
+		if(speed < this._client.getMinArmySpeed())
+			speed = this._client.getMinArmySpeed();
+
+		console.log('start send army ' + armyIds[i] + ' speed ' + speed);
 
 		//отправили армию
-		var res = this._client.sendArmy(armyIds[i], this._address);
+		var res = this._client.sendArmy(armyIds[i], address, speed);
 		if(res !== true)
 		{
 			console.log('fail send army');

@@ -169,11 +169,11 @@ gameClient.prototype.createArmy = function(unitId, army){
  * @param string addr Army destination in format %d.%d.%d
  * @returns boolean
  */
-gameClient.prototype.sendArmy = function(armyId, addr){
+gameClient.prototype.sendArmy = function(armyId, addr, speed){
 	var params = myLibs.encodePostParams({
 		"ck": this._ck,
 		"onLoad": "[type Function]",
-		"xmldata": '<attack res="ALL_RES" speed="150" destination="' + addr + '" id_army="' + armyId + '" />'
+		"xmldata": '<attack res="ALL_RES" speed="' + speed + '" destination="' + addr + '" id_army="' + armyId + '" />'
 	});
 	var request = new XHR();
 	request.open('POST', this._getActionUrl(), false);
