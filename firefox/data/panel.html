@@ -23,6 +23,7 @@
 				<option value="7">стражник</option>
 				<option value="69">огнемётчик</option>
 			</select>
+			только создать <input name="onlyCreate" type="checkbox"/>
 			<br>
 			<select name="ring" >
 				<option value="1">ворания</option>
@@ -30,7 +31,7 @@
 				<option value="3">псолеон</option>
 				<option value="4">мельсион</option>
 			</select>
-			<input name="compl" value="" type="number" placeholder="комплекс" max="2000" min="1"/>
+			комплекс <input name="compl" value="" type="number" placeholder="комплекс" max="2000" min="1"/>
 			<select name="sota" >
 				<option value="1">1</option>
 				<option value="2">2</option>
@@ -39,6 +40,8 @@
 				<option value="5">5</option>
 				<option value="6">6</option>
 			</select>
+			интервал скорости полёта серий (в %)<input name="delay" value="0" type="number" placeholder="задержка между сериями" max="10" min="0"/>
+			количество армий в серии <input name="seriesArmyCount" value="1" type="number" placeholder="количество армий в серии" max="10" min="1"/>
 		</div>
 
 		<button name="spamStart" value="start" id="spamStart" class="js-spam-start">пуск!</button>

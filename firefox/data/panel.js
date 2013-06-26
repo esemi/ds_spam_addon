@@ -7,10 +7,13 @@
 		console.log('spamStart button fire');
 		self.port.emit("spamStart", {
 			countArmy:150,
+			unitId: 3,
+			onlyCreate: false,
+			delay: 1,
+			seriesArmyCount: 3,
 			ring: 3,
-			compl: 123,
-			sota: 1,
-			unitId: 3
+			compl: 264,
+			sota: 1
 		});
 	};
 

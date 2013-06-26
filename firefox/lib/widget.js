@@ -70,6 +70,44 @@ var spamCallback = function(panel, client){
 
 };
 
+/**
+ * Check spam sender options
+ *
+ * @return mixed True if valid and string contains fail message if failed
+ */
+spamCallback.prototype._parseOptions = function(options){
+	var intRegExp = /\d+/;
+	if( typeof options.countArmy === 'undefined' || !intRegExp.test(options.countArmy) || parseInt(options.countArmy) < 1 )
+		return 'Invalid army count';
+
+	if( typeof options.unitId === 'undefined' || !intRegExp.test(options.unitId) || parseInt(options.unitId) < 1 )
+		return 'Invalid unit id';
+
+	if( typeof options.onlyCreate === 'undefined' )
+		return 'Invalid "create only" flag';
+
+	if( !options.onlyCreate )
+	{
+		if( typeof options.ring === 'undefined' || !intRegExp.test(options.ring) || parseInt(options.ring) < 1 ||  parseInt(options.ring) > 4 )
+			return 'Invalid ring';
+
+		if( typeof options.compl === 'undefined' || !intRegExp.test(options.compl) || parseInt(options.compl) < 1 )
+			return 'Invalid compl';
+
+		if( typeof options.sota === 'undefined' || !intRegExp.test(options.sota) || parseInt(options.sota) < 1 ||  parseInt(options.sota) > 6 )
+			return 'Invalid sota';
+
+		if( typeof options.delay === 'undefined' || !intRegExp.test(options.delay) || parseInt(options.delay) < 0 ||  parseInt(options.delay) > 10 )
+			return 'Invalid delay';
+
+		if( typeof options.seriesArmyCount === 'undefined' || !intRegExp.test(options.seriesArmyCount) || parseInt(options.seriesArmyCount) < 1 ||  parseInt(options.seriesArmyCount) > 10 )
+			return 'Invalid series army count';
+	}
+
+	this._opt = options;
+	return true;
+};
+
 spamCallback.prototype.log = function(message){
 	this._panel.port.emit('add-log', message);
 };
@@ -83,27 +121,19 @@ spamCallback.prototype.start = function(options){
 	}
 
 	//check options
-	var intRegExp = /\d+/;
-	if(
-		typeof options.countArmy === 'undefined' || !intRegExp.test(options.countArmy) ||
-		typeof options.ring === 'undefined' || !intRegExp.test(options.ring) ||
-		typeof options.compl === 'undefined' || !intRegExp.test(options.compl) ||
-		typeof options.sota === 'undefined' || !intRegExp.test(options.sota) ||
-		typeof options.unitId === 'undefined' || !intRegExp.test(options.unitId)
-	){
-		console.log('invalid options');
-		this.log('invalid options');
+	var res = this._parseOptions(options);
+	if( res !== true )
+	{
+		console.log('invalid options ' + res);
+		this.log('invalid options ' + res);
 		return;
 	}
-	this._opt = options;
 
 	//generate army name
 	this._armyPrefix = myLibs.randomString(10);
-	this._address = [this._opt.ring, this._opt.compl, this._opt.sota].join('.');
 	var mess =
-			'start ' + this._opt.countArmy +
-			' army create and send to ' + this._address +
-			' by unit id ' + this._opt.unitId +
+			'start task for ' + this._opt.countArmy +
+			' army by unit id ' + this._opt.unitId +
 			' army prefix - "' + this._armyPrefix + '"';
 	console.log(mess);
 	this.log(mess);
@@ -161,7 +191,7 @@ spamCallback.prototype.createArmy = function(){
 		createdArmy.push(armyName);
 	}
 
-	if( createdArmy.length > 0)
+	if( createdArmy.length > 0 && !this._opt.onlyCreate )
 	{
 		this.sendArmy(createdArmy);
 	}
@@ -177,6 +207,7 @@ spamCallback.prototype.sendArmy = function(armyNames){
 		return;
 	}
 
+	this._address = [this._opt.ring, this._opt.compl, this._opt.sota].join('.');
 	for( var i in armyIds )
 	{
 		console.log('start send army ' + armyIds[i]);
