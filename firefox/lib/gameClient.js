@@ -40,8 +40,9 @@ gameClient.prototype.init = function(currentUrl){
 	if( /^\/ds\/index.php\?/.test(url.path) )
 	{
 		var ckMatches = /ck=([\d\w]{10})\&/.exec(url.path);
-		if( ckMatches !== null && ckMatches.length === 2 )
+		if( ckMatches !== null && ckMatches.length === 2 ){
 			this._ck = ckMatches[1];
+		}
 
 		var ssMatches = /SIDIX=([\w\d]{26})/.exec(url.path);
 		if( ssMatches !== null && ssMatches.length === 2 )
@@ -212,7 +213,9 @@ gameClient.prototype.getMaxArmySpeed = function(){
 gameClient.prototype.isInitiated = function(){
 	return this._isInititated;
 };
-
+gameClient.prototype.getCk = function(){
+	return this._ck;
+};
 
 gameClient.prototype._parseCk = function(content){
 	var ckMatches = /\&ck=([\d\w]{10})\&loadkey=/i.exec(content);

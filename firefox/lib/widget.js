@@ -24,21 +24,7 @@ myWidget.prototype.create =  function(){
 		height:400,
 		contentURL: self.data.url("panel.html"),
 		contentScriptFile: self.data.url('panel.js'),
-		contentScriptWhen: 'ready',
-		onShow: function() {
-			var url = TABS.activeTab.url;
-			var res = _self._client.init(url);
-			if( res ){
-				console.log('show panel');
-				_self._panel.port.emit('show-panel');
-				_self._worker = TABS.activeTab.attach({
-					contentScriptFile: self.data.url('game-adapter.js')
-				});
-			}else{
-				console.log('hide panel');
-				_self._panel.port.emit('hide-panel');
-			}
-		}
+		contentScriptWhen: 'ready'
 	});
 
 	this._widget = WIDGET.Widget({
@@ -52,10 +38,32 @@ myWidget.prototype.create =  function(){
 myWidget.prototype.initListeners = function(){
 	console.log('init widget listeners call');
 
-	var callback = new spamCallback(this._panel, this._client);
-	this._panel.port.on("spamStart", function(options) {
+	var _self = this;
+
+	this._panel.port.on("spamStart", function(options){
 		console.log("spamStart event fire");
+		var callback = new spamCallback(_self._panel, _self._client);
 		callback.start(options);
+	});
+
+	this._panel.on('show', function(){
+		var url = TABS.activeTab.url;
+		var res = _self._client.init(url);
+		if( res ){
+			console.log('show panel');
+			_self._panel.port.emit('show-panel');
+			_self._worker = TABS.activeTab.attach({
+				contentScriptFile: self.data.url('game-adapter.js')
+			});
+		}else{
+			console.log('hide panel');
+			_self._panel.port.emit('hide-panel');
+		}
+	});
+
+	EVENTS.on(this._client, "ckChaged", function(){
+		console.log('ckChaged event fire ' + _self._client.getCk());
+		_self._worker.port.emit('updateCk', _self._client.getCk());
 	});
 };
 
@@ -66,11 +74,6 @@ var spamCallback = function(panel, client){
 	this._opt;
 	this._armyPrefix;
 	this._address;
-
-	EVENTS.on(this._client, "ckChaged", function() {
-		console.log('ckChaged event fire');
-	});
-
 };
 
 spamCallback.prototype._parseOptions = function(options){

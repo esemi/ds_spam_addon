@@ -6,9 +6,9 @@
 	document.getElementById("spamStart").onclick = function() {
 		console.log('spamStart button fire');
 		self.port.emit("spamStart", {
-			countArmy:100,
+			countArmy:1,
 			unitId: 3,
-			onlyCreate: false,
+			onlyCreate: true,
 			delay: 4,
 			seriesArmyCount: 2,
 			ring: 3,
@@ -32,5 +32,4 @@
 		var d = new Date();
 		document.getElementById("log").innerHTML += d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ': ' + message + "\n";
 	});
-
 })();
