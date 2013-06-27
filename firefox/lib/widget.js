@@ -4,21 +4,17 @@ var TABS = require("sdk/tabs");
 var NOTIFICATIONS = require("sdk/notifications");
 var EVENTS = require('sdk/event/core');
 
-var myConfig = require("./config.js").config;
-var myLibs = require("./libs.js");
-
-
 var myWidget = function(){
 	this._panel;
 	this._widget;
 	this._worker;
+	this._callback;
 	this._client = require("./gameClient.js").getClient();
 };
 
 myWidget.prototype.create =  function(){
 	console.log('create widget call');
 
-	var _self = this;
 	this._panel = require("sdk/panel").Panel({
 		width:750,
 		height:400,
@@ -33,6 +29,8 @@ myWidget.prototype.create =  function(){
 		contentURL: self.data.url("i/16.png"),
 		panel: this._panel
 	});
+
+	this._callback = new spamCallback(this._panel, this._client);
 };
 
 myWidget.prototype.initListeners = function(){
@@ -42,8 +40,7 @@ myWidget.prototype.initListeners = function(){
 
 	this._panel.port.on("spamStart", function(options){
 		console.log("spamStart event fire");
-		var callback = new spamCallback(_self._panel, _self._client);
-		callback.start(options);
+		_self._callback.start(options);
 	});
 
 	this._panel.on('show', function(){
@@ -62,6 +59,14 @@ myWidget.prototype.initListeners = function(){
 	EVENTS.on(this._client, "ckChaged", function(){
 		_self._worker.port.emit('update-сk', _self._client.getCk());
 	});
+
+	EVENTS.on(this._callback, "startWork", function(){
+		_self._worker.port.emit('lock-client');
+	});
+
+	EVENTS.on(this._callback, "endWork", function(){
+		_self._worker.port.emit('unlock-client');
+	});
 };
 
 
@@ -70,7 +75,6 @@ var spamCallback = function(panel, client){
 	this._client = client;
 	this._opt;
 	this._armyPrefix;
-	this._address;
 };
 
 spamCallback.prototype._parseOptions = function(options){
@@ -111,24 +115,21 @@ spamCallback.prototype.log = function(message){
 };
 
 spamCallback.prototype.start = function(options){
-	if( !this._client.isInitiated() )
-	{
-		console.log('client not initiated');
-		this.log('client not initiated');
-		return;
+
+	EVENTS.emit(this, 'startWork');
+
+	if( !this._client.isInitiated() ){
+		return this.end('client not initiated');
 	}
 
 	//check options
 	var res = this._parseOptions(options);
-	if( res !== true )
-	{
-		console.log('invalid options ' + res);
-		this.log('invalid options ' + res);
-		return;
+	if( res !== true ){
+		return this.end('invalid options ' + res);
 	}
 
 	//generate army name
-	this._armyPrefix = myLibs.randomString(10);
+	this._armyPrefix = require("./libs.js").randomString(10);
 	var mess =
 			'start task for ' + this._opt.countArmy +
 			' army by unit id ' + this._opt.unitId +
@@ -142,18 +143,13 @@ spamCallback.prototype.start = function(options){
 spamCallback.prototype.findArmyBase = function(){
 	var res = this._client.loadBuildMap();
 	if( res !== true ){
-		console.log('loading build map failed');
-		this.log('loading build map failed');
-		return;
+		return this.end('loading build map failed');
 	}
 	this.log('loading build map success');
 
 	var res = this._client.getArmyBuildId();
-	if( res === null )
-	{
-		console.log('army base build id not found');
-		this.log('army base build id not found');
-		return;
+	if( res === null ){
+		return this.end('army base build id not found');
 	}
 	this.log('army base build id found success ' + res);
 
@@ -165,13 +161,11 @@ spamCallback.prototype.createArmy = function(){
 	for( var i=1; i<=this._opt.countArmy; i++ )
 	{
 		var armyName = this._armyPrefix.concat(i);
-
 		console.log('create army ' + armyName);
 
 		//создали армию
 		var res = this._client.createArmy(this._opt.unitId, armyName);
-		if(res !== true)
-		{
+		if(res !== true){
 			console.log('fail create army');
 			this.log('fail create army');
 			break;
@@ -192,17 +186,16 @@ spamCallback.prototype.createArmy = function(){
 	if( createdArmy.length > 0 && !this._opt.onlyCreate )
 	{
 		this.sendArmy(createdArmy);
+	}else{
+		this.end('created ' + createdArmy.length + ' army');
 	}
 };
 
 spamCallback.prototype.sendArmy = function(armyNames){
 	console.log('created ' + armyNames.length + ' army');
 	var armyIds = this._client.loadArmyOverview(armyNames);
-	if(armyIds === false)
-	{
-		console.log('fail loading army ids');
-		this.log('fail loading army ids');
-		return;
+	if(armyIds === false){
+		return this.end('fail loading army ids');
 	}
 
 	var address = [this._opt.ring, this._opt.compl, this._opt.sota].join('.');
@@ -240,8 +233,7 @@ spamCallback.prototype.sendArmy = function(armyNames){
 
 		//отправили армию
 		var res = this._client.sendArmy(armyIds[i], address, speed);
-		if(res !== true)
-		{
+		if(res !== true){
 			console.log('fail send army');
 			this.log('fail send army');
 			break;
@@ -256,9 +248,20 @@ spamCallback.prototype.sendArmy = function(armyNames){
 			break;
 		}
 	}
+
+	this.end('end work');
 };
 
+spamCallback.prototype.end = function( message ){
+	EVENTS.emit(this, 'endWork');
+	console.log('end message: ' + message);
+	this.log('end message: ' + message);
 
+	NOTIFICATIONS.notify({
+		title: 'ds_spam',
+		text: 'Work ended with message "' + message + '"'
+	});
+};
 
 exports.getWidget = function(){
 	return new myWidget();
