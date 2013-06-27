@@ -1,13 +1,25 @@
 (function(){
 
+	//блочим соту
+	self.port.on("lock-client", function(){
+		console.log('block client port on');
+	});
+
+	//разлочим соту
+	self.port.on("unlock-client", function(){
+		console.log('unblock client port on');
+	});
+
+	//обновляем ck во flash клиенте игры
+	self.port.on("update-сk", function(newCk){
+		console.log('update ck port on ' + newCk);
+		window.document.getElementById('ds').innerHTML = window.document.getElementById('ds').innerHTML.replace(/ck=([\d\w]{10})/g, 'ck=' + newCk);
+	});
+
 	self.port.on("getCk", function() {
 		console.log('getCk on ' + window.document.readyState);
 		self.port.emit("gotCk", 'ck key from source');
 	});
 
-	//обновляем ck во flash клиенте игры
-	self.port.on("updateCk", function(newCk){
-		console.log('update ck port on' + newCk);
-	});
 
 })();

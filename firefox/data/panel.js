@@ -6,7 +6,7 @@
 	document.getElementById("spamStart").onclick = function() {
 		console.log('spamStart button fire');
 		self.port.emit("spamStart", {
-			countArmy:1,
+			countArmy:10,
 			unitId: 3,
 			onlyCreate: true,
 			delay: 4,

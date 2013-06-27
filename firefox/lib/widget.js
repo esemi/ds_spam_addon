@@ -50,20 +50,17 @@ myWidget.prototype.initListeners = function(){
 		var url = TABS.activeTab.url;
 		var res = _self._client.init(url);
 		if( res ){
-			console.log('show panel');
 			_self._panel.port.emit('show-panel');
 			_self._worker = TABS.activeTab.attach({
 				contentScriptFile: self.data.url('game-adapter.js')
 			});
 		}else{
-			console.log('hide panel');
 			_self._panel.port.emit('hide-panel');
 		}
 	});
 
 	EVENTS.on(this._client, "ckChaged", function(){
-		console.log('ckChaged event fire ' + _self._client.getCk());
-		_self._worker.port.emit('updateCk', _self._client.getCk());
+		_self._worker.port.emit('update-сk', _self._client.getCk());
 	});
 };
 
@@ -260,6 +257,7 @@ spamCallback.prototype.sendArmy = function(armyNames){
 		}
 	}
 };
+
 
 
 exports.getWidget = function(){
