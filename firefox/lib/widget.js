@@ -184,8 +184,8 @@ spamCallback.prototype.createArmy = function(){
 		//создали армию
 		var res = this._client.createArmy(this._opt.unitId, armyName);
 		if(res !== true){
-			console.log('fail create army');
-			this.log('fail create army');
+			console.log('fail create army: ' + res);
+			this.log('fail create army: ' + res);
 			break;
 		}
 
@@ -193,8 +193,8 @@ spamCallback.prototype.createArmy = function(){
 		this.log('server response: ' + this._client.getLastMessage());
 		if( ! /была\sсоздана\sновая\sармия/.test(this._client.getLastMessage()) )
 		{
-			console.log('fail message from server (create army)');
-			this.log('fail message from server (create army)');
+			console.log('warning message from server (create army)');
+			this.log('warning message from server (create army)');
 			break;
 		}
 
@@ -252,8 +252,8 @@ spamCallback.prototype.sendArmy = function(armyNames){
 		//отправили армию
 		var res = this._client.sendArmy(armyIds[i], address, speed);
 		if(res !== true){
-			console.log('fail send army');
-			this.log('fail send army');
+			console.log('fail send army: ' + res);
+			this.log('fail send army: ' + res);
 			break;
 		}
 
@@ -261,8 +261,8 @@ spamCallback.prototype.sendArmy = function(armyNames){
 		this.log('server response: ' + this._client.getLastMessage());
 		if( ! /получила\sприказ\sатаковать\sсоту/.test(this._client.getLastMessage()) )
 		{
-			console.log('fail message from server (send army)');
-			this.log('fail message from server (send army)');
+			console.log('warning message from server (send army)');
+			this.log('warning message from server (send army)');
 			break;
 		}
 	}
