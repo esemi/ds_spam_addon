@@ -6,64 +6,59 @@ var EVENTS = require('sdk/event/core');
 
 var myConfig = require("./config.js").config;
 var myLibs = require("./libs.js");
-var gameClient = require("./gameClient.js").getClient();
 
-var myWidget = null;
-var myPanel = null;
 
-exports.panel = myPanel;
-exports.widget = myWidget;
+var myWidget = function(){
+	this._panel;
+	this._widget;
+	this._worker;
+	this._client = require("./gameClient.js").getClient();
+};
 
-exports.create = function()
-{
+myWidget.prototype.create =  function(){
 	console.log('create widget call');
 
-	myPanel = require("sdk/panel").Panel({
-		width:700,
+	var _self = this;
+	this._panel = require("sdk/panel").Panel({
+		width:750,
 		height:400,
 		contentURL: self.data.url("panel.html"),
 		contentScriptFile: self.data.url('panel.js'),
 		contentScriptWhen: 'ready',
 		onShow: function() {
 			var url = TABS.activeTab.url;
-
-
-			var res = gameClient.init(url);
+			var res = _self._client.init(url);
 			if( res ){
 				console.log('show panel');
-
-				TABS.activeTab.attach({
+				_self._panel.port.emit('show-panel');
+				_self._worker = TABS.activeTab.attach({
 					contentScriptFile: self.data.url('game-adapter.js')
 				});
-				
-				myPanel.port.emit('show-panel');
-
-
 			}else{
 				console.log('hide panel');
-				myPanel.port.emit('hide-panel');
+				_self._panel.port.emit('hide-panel');
 			}
 		}
 	});
 
-	myWidget = WIDGET.Widget({
+	this._widget = WIDGET.Widget({
 		id: "dsSpamWidget",
 		label: "DS spam",
 		contentURL: self.data.url("i/16.png"),
-		panel: myPanel
+		panel: this._panel
 	});
 };
 
-exports.initListeners = function()
-{
+myWidget.prototype.initListeners = function(){
 	console.log('init widget listeners call');
 
-	var callback = new spamCallback(myPanel, gameClient);
-	myPanel.port.on("spamStart", function(options) {
+	var callback = new spamCallback(this._panel, this._client);
+	this._panel.port.on("spamStart", function(options) {
 		console.log("spamStart event fire");
 		callback.start(options);
 	});
 };
+
 
 var spamCallback = function(panel, client){
 	this._panel = panel;
@@ -78,11 +73,6 @@ var spamCallback = function(panel, client){
 
 };
 
-/**
- * Check spam sender options
- *
- * @return mixed True if valid and string contains fail message if failed
- */
 spamCallback.prototype._parseOptions = function(options){
 	var intRegExp = /\d+/;
 	if( typeof options.countArmy === 'undefined' || !intRegExp.test(options.countArmy) || parseInt(options.countArmy) < 1 )
@@ -266,4 +256,9 @@ spamCallback.prototype.sendArmy = function(armyNames){
 			break;
 		}
 	}
+};
+
+
+exports.getWidget = function(){
+	return new myWidget();
 };
