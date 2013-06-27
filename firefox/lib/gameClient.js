@@ -213,11 +213,14 @@ gameClient.prototype.isInitiated = function(){
 gameClient.prototype.getCk = function(){
 	return this._ck;
 };
+gameClient.prototype.setCk = function(ck){
+	this._ck = ck;
+};
 
 gameClient.prototype._parseCk = function(content){
 	var ckMatches = /\&ck=([\d\w]{10})\&loadkey=/i.exec(content);
 	if( ckMatches !== null && ckMatches.length === 2 ){
-		this._ck = ckMatches[1];
+		this.setCk(ckMatches[1]);
 		EVENTS.emit(this, 'ckChaged');
 		return true;
 	}

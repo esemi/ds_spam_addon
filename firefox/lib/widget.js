@@ -52,7 +52,6 @@ myWidget.prototype.initListeners = function(){
 				contentScriptFile: self.data.url('game-adapter.js')
 			});
 			_self._worker.port.on("returnCk", function(ck){
-				console.log('return ck on' + ck);
 				_self._callback.updateCkFromFlash(ck);
 			});
 		}else{
@@ -150,9 +149,12 @@ spamCallback.prototype.start = function(options){
 };
 
 spamCallback.prototype.updateCkFromFlash = function(ck){
-
 	console.log('update new ck ' + ck);
-	
+	if( ck === null ){
+		return this.end('update ck from flash vars failed');
+	}
+
+	this._client.setCk(ck);
 	this.findArmyBase();
 };
 
