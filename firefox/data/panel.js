@@ -7,7 +7,7 @@
 		//@TODO check options before send
 		self.port.emit("spamStart", {
 			countArmy:150,
-			unitId: 3,
+			unitId: document.getElementById('unitId').value,
 			onlyCreate: false,
 			delay: 5,
 			seriesArmyCount: 3,

@@ -3,7 +3,6 @@ var TABS = require("sdk/tabs");
 var URL_PARSER = require("sdk/url").URL;
 var XHR = require("sdk/net/xhr").XMLHttpRequest;
 var REQUEST = require("sdk/request");
-var EVENTS = require('sdk/event/core');
 
 var myLibs = require("./libs.js");
 
@@ -214,7 +213,6 @@ gameClient.prototype._parseCk = function(content){
 	var ckMatches = /\&ck=([\d\w]{10})/i.exec(content);
 	if( ckMatches !== null && ckMatches.length === 2 ){
 		this.setCk(ckMatches[1]);
-		EVENTS.emit(this, 'ckChaged');
 		return true;
 	}
 	return false;

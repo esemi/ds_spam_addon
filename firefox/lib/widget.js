@@ -37,7 +37,6 @@ myWidget.prototype.initListeners = function(){
 	console.log('init widget listeners call');
 
 	var _self = this;
-
 	this._panel.port.on("spamStart", function(options){
 		console.log("spamStart event fire");
 		_self._callback.start(options);
@@ -48,12 +47,16 @@ myWidget.prototype.initListeners = function(){
 		var res = _self._client.init(url);
 		if( res ){
 			_self._panel.port.emit('show-panel');
+
+			//TABS.activeTab.reload();
 			_self._worker = TABS.activeTab.attach({
 				contentScriptFile: self.data.url('game-adapter.js')
 			});
 			_self._worker.port.on("returnCk", function(ck){
 				_self._callback.updateCkFromFlash(ck);
 			});
+
+
 		}else{
 			_self._panel.port.emit('hide-panel');
 		}
@@ -74,9 +77,9 @@ myWidget.prototype.initListeners = function(){
 
 	EVENTS.on(this._callback, "endWork", function(){
 		_self._worker.port.emit('unlock-client');
+		_self._worker.port.emit('update-сk', _self._client.getCk());
 	});
 };
-
 
 var spamCallback = function(panel, client){
 	this._panel = panel;

@@ -1,36 +1,36 @@
 (function(){
-	var dsElem = window.document.getElementById('ds');
-	if( dsElem !== null )
-	{
-		//блочим соту
-		self.port.on("lock-client", function(){
-			console.log('block client port on');
-			dsElem.style.display = 'none';
-		});
+	self.port.on("reload-page", function(){
+		console.log('reload page port on');
+		window.location = window.location + '&hash=sdasdasd';
+		window.parent.location = window.parent.location.href;
+	});
 
-		//разлочим соту
-		self.port.on("unlock-client", function(){
-			console.log('unblock client port on');
-			dsElem.style.display = 'block';
-		});
+	//блочим соту
+	self.port.on("lock-client", function(){
+		console.log('block client port on');
+		window.document.getElementById('ds').style.display = 'none';
+	});
 
-		//обновляем ck во flash клиенте игры
-		self.port.on("update-сk", function(newCk){
-			console.log('update ck port on ' + newCk);
-			dsElem.innerHTML = dsElem.innerHTML.replace(/ck=([\d\w]{10})/g, 'ck=' + newCk);
-		});
+	//разлочим соту
+	self.port.on("unlock-client", function(){
+		console.log('unblock client port on');
+		window.document.getElementById('ds').style.display = 'block';
+	});
 
-		//выдираем текущий ck из кода игры
-		self.port.on("get-сk", function() {
-			console.log('get сk port on');
+	//обновляем ck во flash клиенте игры
+	self.port.on("update-сk", function(newCk){
+		console.log('update ck port on ' + newCk);
+		window.document.getElementById('ds').innerHTML = window.document.getElementById('ds').innerHTML.replace(/ck=([\d\w]{10})/g, 'ck=' + newCk);
+	});
 
-			var matches = dsElem.innerHTML.match(/ck=([\d\w]{10})/);
-			var ck = null;
-			if( matches !== null && matches.length === 2 ){
-				ck = matches[1];
-			}
-
-			self.port.emit("returnCk", ck);
-		});
-	}
+	//выдираем текущий ck из кода игры
+	self.port.on("get-сk", function() {
+		console.log('get сk port on');
+		var matches = window.document.getElementById('ds').innerHTML.match(/ck=([\d\w]{10})/);
+		var ck = null;
+		if( matches !== null && matches.length === 2 ){
+			ck = matches[1];
+		}
+		self.port.emit("returnCk", ck);
+	});
 })();
