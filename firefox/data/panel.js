@@ -6,13 +6,13 @@
 	document.getElementById("spamStart").onclick = function() {
 		console.log('spamStart button fire');
 		self.port.emit("spamStart", {
-			countArmy:10,
+			countArmy:150,
 			unitId: 3,
-			onlyCreate: true,
-			delay: 4,
-			seriesArmyCount: 2,
+			onlyCreate: false,
+			delay: 5,
+			seriesArmyCount: 3,
 			ring: 3,
-			compl: 264,
+			compl: 123,
 			sota: 1
 		});
 	};

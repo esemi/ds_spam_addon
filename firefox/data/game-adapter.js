@@ -18,10 +18,11 @@
 		window.document.getElementById('ds').innerHTML = window.document.getElementById('ds').innerHTML.replace(/ck=([\d\w]{10})/g, 'ck=' + newCk);
 	});
 
-	//
+	//выдираем текущий ck из кода игры
 	self.port.on("get-сk", function() {
 		console.log('get сk port on');
-		self.port.emit("got ck", 'ck key from source');
+		//@TODO parse ck from flash vars
+		self.port.emit("returnCk", 'ck key from source');
 	});
 
 })();

@@ -5,10 +5,7 @@ var XHR = require("sdk/net/xhr").XMLHttpRequest;
 var REQUEST = require("sdk/request");
 var EVENTS = require('sdk/event/core');
 
-var myConfig = require("./config.js").config;
 var myLibs = require("./libs.js");
-
-var instance = null;
 
 var gameClient = function(){
 	this._sessid = null;
@@ -318,8 +315,5 @@ gameClient.prototype._getActionUrl = function(){
 
 
 exports.getClient = function(){
-	if(instance === null){
-		instance = new gameClient();
-	}
-	return instance;
+	return new gameClient();
 };

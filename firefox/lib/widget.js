@@ -51,13 +51,22 @@ myWidget.prototype.initListeners = function(){
 			_self._worker = TABS.activeTab.attach({
 				contentScriptFile: self.data.url('game-adapter.js')
 			});
+			_self._worker.port.on("returnCk", function(ck){
+				console.log('return ck on' + ck);
+				_self._callback.updateCkFromFlash(ck);
+			});
 		}else{
 			_self._panel.port.emit('hide-panel');
 		}
 	});
 
+	//событие изменения ck в игровом клиенте (изменяем его и в игре)
 	EVENTS.on(this._client, "ckChaged", function(){
 		_self._worker.port.emit('update-сk', _self._client.getCk());
+	});
+
+	EVENTS.on(this._callback, "gettingCk", function(){
+		_self._worker.port.emit('get-сk');
 	});
 
 	EVENTS.on(this._callback, "startWork", function(){
@@ -137,6 +146,13 @@ spamCallback.prototype.start = function(options){
 	console.log(mess);
 	this.log(mess);
 
+	EVENTS.emit(this, 'gettingCk');
+};
+
+spamCallback.prototype.updateCkFromFlash = function(ck){
+
+	console.log('update new ck ' + ck);
+	
 	this.findArmyBase();
 };
 
