@@ -4,5 +4,7 @@
 	"author": "esemi",
 	"version": "0.5",
 	"id": "jid1-AMISBhr9M1sTRE",
+	"icon": "data/img/48.png",
+	"icon64": "data/img/64.png",
 	"description": "Аддон для быстрой отправки спама в игре destinysphere.ru"
 }

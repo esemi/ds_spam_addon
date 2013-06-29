@@ -26,7 +26,7 @@ myWidget.prototype.create =  function(){
 	this._widget = WIDGET.Widget({
 		id: "dsSpamWidget",
 		label: "DS spam",
-		contentURL: self.data.url("i/16.png"),
+		contentURL: self.data.url("img/16.png"),
 		panel: this._panel
 	});
 
