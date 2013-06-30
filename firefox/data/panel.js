@@ -34,8 +34,10 @@
 	//добавляем сообщение в лог
 	self.port.on("add-log", function(message){
 		var d = new Date();
-		document.getElementById("log").innerHTML += d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ': ' + message + "\n";
-		//@TODO auto scroll log textarea
+		var elemLog = document.getElementById("log");
+		elemLog.innerHTML += d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ': ' + message + "\n";
+
+		elemLog.scrollTop = elemLog.scrollHeight;
 	});
 
 	//@TODO засерять кнопочки при включенной галочке
