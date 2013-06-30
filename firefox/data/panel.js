@@ -20,13 +20,15 @@
 	//открываем управляющую панель при событии
 	self.port.on("show-panel", function(){
 		console.log('show panel port on');
-		//@TODO release toggle
+		document.getElementById("js-control-panel").classList.remove("hide");
+		document.getElementById("js-gamepageonly-message").classList.add("hide");
 	});
 
 	//скрываем управляющую панель при событии
 	self.port.on("hide-panel", function(){
 		console.log('hide panel port on');
-		//@TODO release toggle
+		document.getElementById("js-control-panel").classList.add("hide");
+		document.getElementById("js-gamepageonly-message").classList.remove("hide");
 	});
 
 	//добавляем сообщение в лог
