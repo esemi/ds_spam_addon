@@ -4,7 +4,6 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta http-equiv="Content-Language" content="ru-RU" />
 		<link rel="stylesheet" type="text/css" href="panel.css">
-		<script src="panel.js"></script>
 	</head>
 
 	<body>
@@ -39,29 +38,31 @@
 						<option value="14">штурмовик</option>
 						<option value="52">транспорт</option>
 					</select>
-					<input id="onlyCreate" name="onlyCreate" type="checkbox"/><label for="onlyCreate">только создать</label>
+					<input id="js-only-create" name="onlyCreate" type="checkbox"/><label for="js-only-create">только создать</label>
 				</div>
-				<div class="v-marign-between-blocks">
-					<label for="ring">Цель: </label>
-					<select id="ring" name="ring" class="hor-margin-between-inputs">
-						<option value="1">ворания</option>
-						<option value="2">лиенсорд</option>
-						<option value="3">псолеон</option>
-						<option value="4">мельсион</option>
-					</select>
-					<input name="compl" value="" type="number" placeholder="компл" max="2000" min="1" class="four-simbol-width hor-margin-between-inputs"/>
-					<select name="sota" >
-						<option value="1">1</option>
-						<option value="2">2</option>
-						<option value="3">3</option>
-						<option value="4">4</option>
-						<option value="5">5</option>
-						<option value="6">6</option>
-					</select>
-				</div>
-				<div class="v-marign-between-blocks">
-					<label for="delay">Интервал между сериями: </label><input id="delay" name="delay" value="0" type="number" placeholder="задержка между сериями" max="10" min="0" class="two-simbol-width hor-margin-between-inputs"/>
-					<label for="seriesArmyCount">армий в серии: </label><input id="seriesArmyCount" name="seriesArmyCount" value="1" type="number" placeholder="количество армий в серии" max="10" min="1" class="two-simbol-width"/>
+				<div id="js-send-army-panel">
+					<div class="v-marign-between-blocks">
+						<label for="ring">Цель: </label>
+						<select id="ring" name="ring" class="hor-margin-between-inputs">
+							<option value="1">ворания</option>
+							<option value="2">лиенсорд</option>
+							<option value="3">псолеон</option>
+							<option value="4">мельсион</option>
+						</select>
+						<input name="compl" value="" type="number" placeholder="компл" max="2000" min="1" class="four-simbol-width hor-margin-between-inputs"/>
+						<select name="sota" >
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+						</select>
+					</div>
+					<div class="v-marign-between-blocks">
+						<label for="delay">Интервал между сериями: </label><input id="delay" name="delay" value="0" type="number" placeholder="задержка между сериями" max="10" min="0" class="two-simbol-width hor-margin-between-inputs"/>
+						<label for="seriesArmyCount">армий в серии: </label><input id="seriesArmyCount" name="seriesArmyCount" value="1" type="number" placeholder="количество армий в серии" max="10" min="1" class="two-simbol-width"/>
+					</div>
 				</div>
 
 				<button name="spamStart" value="start" id="spamStart" class="js-spam-start v-marign-between-blocks l-margin-for-spam-button">пуск!</button>
@@ -71,6 +72,7 @@
 			</div>
 		</div>
 	</div>
+	<script src="panel.js"></script>
 	</body>
 
 </html>

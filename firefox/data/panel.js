@@ -39,5 +39,12 @@
 		elemLog.scrollTop = elemLog.scrollHeight;
 	});
 
-	//@TODO засерять кнопочки при включенной галочке
+	//удалять кнопочки при включенной галочке
+	document.getElementById("js-only-create").onchange = function(){
+		if (this.checked){
+			document.getElementById("js-send-army-panel").classList.add("hide");
+		}else{
+			document.getElementById("js-send-army-panel").classList.remove("hide");
+		}
+	}
 })();
