@@ -34,22 +34,23 @@
 		}
 	}
 
+	//кнопка пуск
 	document.getElementById("spamStart").onclick = function() {
 		console.log('spamStart button fire');
 
-		//@TODO check options before send
 		self.port.emit("spamStart", {
-			countArmy:150,
-			unitId: document.getElementById('unitId').value,
-			onlyCreate: false,
-			delay: 5,
-			seriesArmyCount: 3,
-			ring: 3,
-			compl: 123,
-			sota: 1
+			countArmy: parseInt(document.getElementById("js-count-army").value),
+			unitId: parseInt(document.getElementById("js-unit-id").value),
+			onlyCreate: document.getElementById("js-only-create").checked,
+			delay: parseInt(document.getElementById("js-delay").value),
+			seriesArmyCount: parseInt(document.getElementById("js-series-army-count").value),
+			ring: parseInt(document.getElementById("js-ring").value),
+			compl: parseInt(document.getElementById("js-compl").value),
+			sota: parseInt(document.getElementById("js-sota").value)
 		});
 	};
 
+	//привидение цифровых значений к допустимым максимуму и минимуму
 	(function(){
 		var elems = document.getElementsByClassName("js-prevalidate");
 		for (var i in elems){
@@ -64,4 +65,6 @@
 			}
 		}
 	})();
+
+
 })();
