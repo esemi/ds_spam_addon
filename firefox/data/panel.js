@@ -2,7 +2,33 @@
 
 (function(){
 
-/*
+	function History(){
+		if( typeof(Storage) !== "undefined" ){
+			this._storage = localStorage;
+		}else{
+			this._storage = {};
+		}
+
+		if (typeof (this._storage.lastEnemies) === "undefined" ){
+			this._storage.lastEnemies = JSON.stringify([]);
+		}
+	};
+
+	//@ToDo хранить последние 10
+	//@ToDo хранить уникальные
+	History.prototype.add = function(ring, compl, sota){
+		var temp = JSON.parse(this._storage.lastEnemies);
+		temp.push({ring:ring,compl:compl,sota:sota});
+		this._storage.lastEnemies = JSON.stringify(temp);
+	};
+
+	History.prototype.getAll = function(){
+		return JSON.parse(this._storage.lastEnemies);
+	};
+
+	var history = new History();
+
+
 	//открываем управляющую панель при событии
 	self.port.on("show-panel", function(){
 		console.log('show panel port on');
@@ -24,7 +50,7 @@
 		elemLog.innerHTML += d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ': ' + message + "\n";
 		elemLog.scrollTop = elemLog.scrollHeight;
 	});
-*/
+
 	//очистка лога
 	document.getElementById("js-clear-log").onclick = function(){
 		document.getElementById("js-log").innerHTML = "";
@@ -43,6 +69,11 @@
 	//кнопка пуск
 	document.getElementById("js-spam-start").onclick = function() {
 		console.log('spamStart button fire');
+		history.add(
+			parseInt(document.getElementById("js-ring").value),
+			parseInt(document.getElementById("js-compl").value),
+			parseInt(document.getElementById("js-sota").value)
+		);
 
 		self.port.emit("spamStart", {
 			countArmy: parseInt(document.getElementById("js-count-army").value),
@@ -72,5 +103,24 @@
 		}
 	})();
 
+	//вывод последних врагов
+	(function(){
+		var enemies= history.getAll();
+		var select = document.getElementById("js-last-enemy");
+		if (enemies.length !== 0){
+			for (var i in enemies){
+				var child = document.createElement("option");
+				child.setAttribute("ring", enemies[i].ring);
+				child.setAttribute("compl", enemies[i].compl);
+				child.setAttribute("sota", enemies[i].sota);
+
+				var text = document.createTextNode([enemies[i].ring, enemies[i].compl, enemies[i].sota].join('.'));
+				child.appendChild(text);
+				select.appendChild(child);
+
+			}
+			select.classList.remove("hide");
+		}
+	})();
 
 })();
