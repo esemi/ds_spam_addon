@@ -146,3 +146,15 @@
 	.tab li.unactive{
 		color: #dbdbdb;
 	}
+
+	.text-area{
+		width: 100%;
+	}
+	.clear-log{
+		cursor: pointer;
+		text-decoration: underline;
+		color: #91263b;
+	}
+	.clear-log:hover{
+		text-decoration: none;
+	}

@@ -65,13 +65,14 @@
 					</div>
 				</div>
 
-				<button name="spamStart" value="start" id="spamStart" class="js-spam-start v-marign-between-blocks l-margin-for-spam-button">пуск!</button>
+				<button name="spamStart" value="start" id="js-spam-start" class="v-marign-between-blocks l-margin-for-spam-button">пуск!</button>
 
-			<div>
-				<textarea rows="10" cols="100" id='log' class="js-log"  style="width: 100%"></textarea>
+				<div class="text-center">
+					<textarea rows="10" cols="100" id="js-log" readonly="readonly" class="text-area"></textarea>
+					<span id="js-clear-log" class="clear-log">очистить лог</span>
+				</div>
 			</div>
 		</div>
-	</div>
 	<script src="panel.js"></script>
 	</body>
 

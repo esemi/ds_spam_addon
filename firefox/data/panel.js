@@ -20,11 +20,17 @@
 	//добавляем сообщение в лог
 	self.port.on("add-log", function(message){
 		var d = new Date();
-		var elemLog = document.getElementById("log");
+		var elemLog = document.getElementById("js-log");
 		elemLog.innerHTML += d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ': ' + message + "\n";
 		elemLog.scrollTop = elemLog.scrollHeight;
 	});
 */
+	//очистка лога
+	document.getElementById("js-clear-log").onclick = function(){
+		document.getElementById("js-log").innerHTML = "";
+	}
+
+
 	//удалять кнопочки при включенной галочке
 	document.getElementById("js-only-create").onchange = function(){
 		if (this.checked){
@@ -35,7 +41,7 @@
 	}
 
 	//кнопка пуск
-	document.getElementById("spamStart").onclick = function() {
+	document.getElementById("js-spam-start").onclick = function() {
 		console.log('spamStart button fire');
 
 		self.port.emit("spamStart", {
