@@ -36,7 +36,6 @@
 		var d = new Date();
 		var elemLog = document.getElementById("log");
 		elemLog.innerHTML += d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ': ' + message + "\n";
-
 		elemLog.scrollTop = elemLog.scrollHeight;
 	});
 

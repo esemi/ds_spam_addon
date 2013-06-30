@@ -114,6 +114,9 @@
 	.hor-margin-between-inputs{
 		margin-right: 8px;
 	}
+	.l-margin-for-spam-button{
+		margin-left: 84px;
+	}
 	/*Blocks
 -----------------------------------------------------------------------------------------------*/
 	.main-block{
@@ -129,7 +132,7 @@
 		padding-bottom: 3px;
 		background-color: #e7e9ea;
 		border-radius: 5px 5px 0 0;
-		box-shadow: 1px 1px 2px 0 #2B3844;
+		box-shadow: 1px 1px 2px 0 #1b5828;
 		color: #5C6972;
 		text-align: center;
 		text-decoration: none;
@@ -137,5 +140,9 @@
 	}
 	.tab li.active{
 		background:#f9fafb;
-		color: #000;
+		color: #91263b;
+		font-weight: bold;
+	}
+	.tab li.unactive{
+		color: #dbdbdb;
 	}

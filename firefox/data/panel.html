@@ -9,9 +9,9 @@
 
 	<body>
 		<ul class="tab">
-			<li>спам</li>
-			<li>грабли</li>
-			<li>архи</li>
+			<li class="active">спам</li>
+			<li class="unactive">грабли</li>
+			<li class="unactive">архи</li>
 		</ul>
 		<div class="main-block">
 			<div id="js-gamepageonly-message" class="js-gamepageonly-message text-center hide">
@@ -64,7 +64,7 @@
 					<label for="seriesArmyCount">армий в серии: </label><input id="seriesArmyCount" name="seriesArmyCount" value="1" type="number" placeholder="количество армий в серии" max="10" min="1" class="two-simbol-width"/>
 				</div>
 
-				<div class="text-center v-marign-between-blocks"><button name="spamStart" value="start" id="spamStart" class="js-spam-start">пуск!</button></div>
+				<button name="spamStart" value="start" id="spamStart" class="js-spam-start v-marign-between-blocks l-margin-for-spam-button">пуск!</button>
 
 			<div>
 				<textarea rows="10" cols="100" id='log' class="js-log"  style="width: 100%"></textarea>
