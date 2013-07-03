@@ -1,8 +1,8 @@
 {
-	"name": "ds_spam_bot",
+	"name": "ds_cheater_bot",
 	"license": "MPL 2.0",
 	"author": "esemi",
 	"version": "0.1",
 	"id": "jid1-AMISBhr9M1sTRE",
-	"description": "Аддон для быстрой отправки спама в игре destinysphere.ru"
+	"description": "Аддон для быстрой отправки спама/грабель/архов в игре destinysphere.ru"
 }
