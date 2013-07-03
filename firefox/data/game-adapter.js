@@ -1,4 +1,9 @@
 (function(){
+	self.port.on("reload-page", function(){
+		console.log('reload page port on');
+		window.location = window.location + '&hash=sdasdasd';
+		window.parent.location = window.parent.location.href;
+	});
 
 	//блочим соту
 	self.port.on("lock-client", function(){
@@ -21,8 +26,11 @@
 	//выдираем текущий ck из кода игры
 	self.port.on("get-сk", function() {
 		console.log('get сk port on');
-		//@TODO parse ck from flash vars
-		self.port.emit("returnCk", 'ck key from source');
+		var matches = window.document.getElementById('ds').innerHTML.match(/ck=([\d\w]{10})/);
+		var ck = null;
+		if( matches !== null && matches.length === 2 ){
+			ck = matches[1];
+		}
+		self.port.emit("returnCk", ck);
 	});
-
 })();

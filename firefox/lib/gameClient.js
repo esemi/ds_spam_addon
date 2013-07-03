@@ -3,7 +3,6 @@ var TABS = require("sdk/tabs");
 var URL_PARSER = require("sdk/url").URL;
 var XHR = require("sdk/net/xhr").XMLHttpRequest;
 var REQUEST = require("sdk/request");
-var EVENTS = require('sdk/event/core');
 
 var myLibs = require("./libs.js");
 
@@ -98,8 +97,7 @@ gameClient.prototype.loadBuildMap = function(){
  * @param array armyNames Array of army names
  * @returns mixed Array of army ids or False if failed
  */
-gameClient.prototype.loadArmyOverview = function(armyNames)
-{
+gameClient.prototype.loadArmyOverview = function(armyNames){
 	var params = myLibs.encodePostParams({
 		ck: this._ck,
 		onLoad: '[type Function]',
@@ -130,7 +128,7 @@ gameClient.prototype.loadArmyOverview = function(armyNames)
  *
  * @param int unitId Id unit for create spam army
  * @param string army Army name for create
- * @returns boolean
+ * @returns mixed
  */
 gameClient.prototype.createArmy = function(unitId, army){
 	var params = myLibs.encodePostParams({
@@ -145,16 +143,13 @@ gameClient.prototype.createArmy = function(unitId, army){
 
 	var res = this._parseCk(request.responseText);
 	if( res !== true ){
-		console.log('Not parsed new ck: ' + request.responseText);
-		return false;
+		return 'Not parsed new ck: ' + request.responseText;
 	}
 
-	//console.log(request.responseText);
 	var res = this._parseCreateArmyResponse(request.responseText);
 	if( res !== true )
 	{
-		console.log('Not parsed create army message: ' + request.responseText);
-		return false;
+		return 'Not parsed create army message: ' + request.responseText;
 	}
 
 	return true;
@@ -165,7 +160,7 @@ gameClient.prototype.createArmy = function(unitId, army){
  *
  * @param int armyId
  * @param string addr Army destination in format %d.%d.%d
- * @returns boolean
+ * @returns mixed
  */
 gameClient.prototype.sendArmy = function(armyId, addr, speed){
 	var params = myLibs.encodePostParams({
@@ -180,16 +175,13 @@ gameClient.prototype.sendArmy = function(armyId, addr, speed){
 
 	var res = this._parseCk(request.responseText);
 	if( res !== true ){
-		console.log('Not parsed new ck: ' + request.responseText);
-		return false;
+		return 'Not parsed new ck: ' + request.responseText;
 	}
 
 	//console.log(request.responseText);
 	var res = this._parseSendArmyResponse(request.responseText);
-	if( res !== true )
-	{
-		console.log('Not parsed send army message: ' + request.responseText);
-		return false;
+	if( res !== true ){
+		return 'Not parsed send army message: ' + request.responseText;
 	}
 
 	return true;
@@ -213,12 +205,14 @@ gameClient.prototype.isInitiated = function(){
 gameClient.prototype.getCk = function(){
 	return this._ck;
 };
+gameClient.prototype.setCk = function(ck){
+	this._ck = ck;
+};
 
 gameClient.prototype._parseCk = function(content){
-	var ckMatches = /\&ck=([\d\w]{10})\&loadkey=/i.exec(content);
+	var ckMatches = /\&ck=([\d\w]{10})/i.exec(content);
 	if( ckMatches !== null && ckMatches.length === 2 ){
-		this._ck = ckMatches[1];
-		EVENTS.emit(this, 'ckChaged');
+		this.setCk(ckMatches[1]);
 		return true;
 	}
 	return false;

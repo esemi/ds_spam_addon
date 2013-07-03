@@ -26,7 +26,7 @@ myWidget.prototype.create =  function(){
 	this._widget = WIDGET.Widget({
 		id: "dsSpamWidget",
 		label: "DS spam",
-		contentURL: self.data.url("i/16.png"),
+		contentURL: self.data.url("img/16.png"),
 		panel: this._panel
 	});
 
@@ -37,7 +37,6 @@ myWidget.prototype.initListeners = function(){
 	console.log('init widget listeners call');
 
 	var _self = this;
-
 	this._panel.port.on("spamStart", function(options){
 		console.log("spamStart event fire");
 		_self._callback.start(options);
@@ -48,13 +47,16 @@ myWidget.prototype.initListeners = function(){
 		var res = _self._client.init(url);
 		if( res ){
 			_self._panel.port.emit('show-panel');
+
+			//TABS.activeTab.reload();
 			_self._worker = TABS.activeTab.attach({
 				contentScriptFile: self.data.url('game-adapter.js')
 			});
 			_self._worker.port.on("returnCk", function(ck){
-				console.log('return ck on' + ck);
 				_self._callback.updateCkFromFlash(ck);
 			});
+
+
 		}else{
 			_self._panel.port.emit('hide-panel');
 		}
@@ -75,9 +77,9 @@ myWidget.prototype.initListeners = function(){
 
 	EVENTS.on(this._callback, "endWork", function(){
 		_self._worker.port.emit('unlock-client');
+		_self._worker.port.emit('update-сk', _self._client.getCk());
 	});
 };
-
 
 var spamCallback = function(panel, client){
 	this._panel = panel;
@@ -150,9 +152,12 @@ spamCallback.prototype.start = function(options){
 };
 
 spamCallback.prototype.updateCkFromFlash = function(ck){
-
 	console.log('update new ck ' + ck);
-	
+	if( ck === null ){
+		return this.end('update ck from flash vars failed');
+	}
+
+	this._client.setCk(ck);
 	this.findArmyBase();
 };
 
@@ -182,8 +187,8 @@ spamCallback.prototype.createArmy = function(){
 		//создали армию
 		var res = this._client.createArmy(this._opt.unitId, armyName);
 		if(res !== true){
-			console.log('fail create army');
-			this.log('fail create army');
+			console.log('fail create army: ' + res);
+			this.log('fail create army: ' + res);
 			break;
 		}
 
@@ -191,8 +196,8 @@ spamCallback.prototype.createArmy = function(){
 		this.log('server response: ' + this._client.getLastMessage());
 		if( ! /была\sсоздана\sновая\sармия/.test(this._client.getLastMessage()) )
 		{
-			console.log('fail message from server (create army)');
-			this.log('fail message from server (create army)');
+			console.log('warning message from server (create army)');
+			this.log('warning message from server (create army)');
 			break;
 		}
 
@@ -250,8 +255,8 @@ spamCallback.prototype.sendArmy = function(armyNames){
 		//отправили армию
 		var res = this._client.sendArmy(armyIds[i], address, speed);
 		if(res !== true){
-			console.log('fail send army');
-			this.log('fail send army');
+			console.log('fail send army: ' + res);
+			this.log('fail send army: ' + res);
 			break;
 		}
 
@@ -259,8 +264,8 @@ spamCallback.prototype.sendArmy = function(armyNames){
 		this.log('server response: ' + this._client.getLastMessage());
 		if( ! /получила\sприказ\sатаковать\sсоту/.test(this._client.getLastMessage()) )
 		{
-			console.log('fail message from server (send army)');
-			this.log('fail message from server (send army)');
+			console.log('warning message from server (send army)');
+			this.log('warning message from server (send army)');
 			break;
 		}
 	}

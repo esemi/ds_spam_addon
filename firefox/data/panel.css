@@ -1,0 +1,160 @@
+/* Global Reset
+-----------------------------------------------------------------------------------------------*/
+
+	html, body, div, span, applet, object, iframe,
+	h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+	a, abbr, acronym, address, big, cite, code,
+	del, dfn, em, img, ins, kbd, q, s, samp,
+	small, strike, strong, sub, sup, tt, var,
+	b, u, i, center,
+	dl, dt, dd, ol, ul, li,
+	fieldset, form, label, legend,
+	table, caption, tbody, tfoot, thead, tr, th, td,
+	article, aside, canvas, details, embed,
+	figure, figcaption, footer, header, hgroup,
+	menu, nav, output, ruby, section, summary,
+	time, mark, audio, video {
+			margin: 0;
+			padding: 0;
+			border: 0;
+			font-size: 100%;
+			font: inherit;
+			vertical-align: baseline;
+	}
+	/* HTML5 display-role reset for older browsers */
+	article, aside, details, figcaption, figure,
+	footer, header, hgroup, menu, nav, section {
+			display: block;
+	}
+  /*  body {
+			line-height: 1;
+	}*/
+	a{
+		outline: none;
+	}
+	ol, ul {
+			list-style: none;
+	}
+	blockquote, q {
+			quotes: none;
+	}
+	blockquote:before, blockquote:after,
+	q:before, q:after {
+			content: '';
+			content: none;
+	}
+	table {
+			border-collapse: collapse;
+			border-spacing: 0;
+	}
+	caption, th, td {
+		text-align: left;
+		font-weight: normal;
+	}
+	h1, h2, h3, h4, h5, h6 {
+		font-weight:normal;
+	}
+/*End Global Reset*/
+
+
+/*General Elements
+-----------------------------------------------------------------------------------------------*/
+	html {
+		width: 100%;
+		height:100%;
+		font: 14px/1.5 Arial,Helvetica,sans-serif;
+	}
+	p{
+		margin: 5px 0px 13px;
+	}
+/*End General Elements*/
+
+/*Generic Classes
+-----------------------------------------------------------------------------------------------*/
+	.float-left{
+	float: left;
+}
+
+	.auto-margin{
+		margin: 0px auto;
+	}
+	.text-center{
+		text-align: center;
+	}
+
+	.hide{
+		display: none;
+	}
+
+	.clearfix {
+		zoom: 1;
+	}
+	.clearfix:after {
+	content: ' ';
+	clear:both;
+	display: block;
+	width: 0; height: 0;
+	overflow: hidden;
+	font-size: 0;
+	}
+
+	.two-simbol-width{
+		width: 20pt;
+	}
+	.three-simbol-width{
+		width: 27pt;
+	}
+	.four-simbol-width{
+		width: 42pt;
+	}
+
+	.v-marign-between-blocks{
+		margin-bottom: 12px;
+	}
+	.hor-margin-between-inputs{
+		margin-right: 8px;
+	}
+	.l-margin-for-spam-button{
+		margin-left: 84px;
+	}
+	/*Blocks
+-----------------------------------------------------------------------------------------------*/
+	.main-block{
+		background:#f9fafb url("img/fon.png") top right no-repeat;
+		padding: 26px 18px 31px;
+	}
+	.tab li{
+		width: 84px;
+		height: 18px;
+		display: inline-block;
+		position: relative;
+		margin: 11px 0 0 0;
+		padding-bottom: 3px;
+		background-color: #e7e9ea;
+		border-radius: 5px 5px 0 0;
+		box-shadow: 1px 1px 2px 0 #1b5828;
+		color: #5C6972;
+		text-align: center;
+		text-decoration: none;
+		z-index: -1;
+	}
+	.tab li.active{
+		background:#f9fafb;
+		color: #91263b;
+		font-weight: bold;
+	}
+	.tab li.unactive{
+		color: #dbdbdb;
+	}
+
+	.text-area{
+		width: 100%;
+	}
+	.clear-log{
+		cursor: pointer;
+		text-decoration: underline;
+		color: #91263b;
+	}
+	.clear-log:hover{
+		text-decoration: none;
+	}

@@ -1,54 +1,81 @@
+<!DOCTYPE html>
 <html>
 
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta http-equiv="Content-Language" content="ru-RU" />
 		<link rel="stylesheet" type="text/css" href="panel.css">
-		<script src="panel.js"></script>
 	</head>
 
 	<body>
-		<div class="js-gamepageonly-message">
-			Для использования данного аддона вам необходимо зайти на соту.
-		</div>
+		<ul class="tab">
+			<li class="active">спам</li>
+			<li class="unactive">грабли</li>
+			<li class="unactive">архи</li>
+		</ul>
+		<div class="main-block">
+			<div id="js-gamepageonly-message" class="js-gamepageonly-message text-center hide">
+				Для использования данного аддона вам необходимо зайти на соту.
+			</div>
+			<div id="js-control-panel">
+				<div class="v-marign-between-blocks">
+					<label for="js-count-army">Количество армий:</label> <input id="js-count-army" name="countArmy" value="1" type="number" max="300" min="1" class="js-prevalidate three-simbol-width hor-margin-between-inputs"/>
 
-		<div>
-			<input name="countArmy" value="" type="number" placeholder="количество армий" max="300" min="1"/>
-			<br>
-			<select name="unitId" >
-				<option value="3">солдат</option>
-				<option value="4">гренадёр</option>
-				<option value="5">камикадзе</option>
-				<option value="6">ветеран</option>
-				<option value="7">стражник</option>
-				<option value="69">огнемётчик</option>
-			</select>
-			только создать <input name="onlyCreate" type="checkbox"/>
-			<br>
-			<select name="ring" >
-				<option value="1">ворания</option>
-				<option value="2">лиенсорд</option>
-				<option value="3">псолеон</option>
-				<option value="4">мельсион</option>
-			</select>
-			комплекс <input name="compl" value="" type="number" placeholder="комплекс" max="2000" min="1"/>
-			<select name="sota" >
-				<option value="1">1</option>
-				<option value="2">2</option>
-				<option value="3">3</option>
-				<option value="4">4</option>
-				<option value="5">5</option>
-				<option value="6">6</option>
-			</select>
-			интервал скорости полёта серий (в %)<input name="delay" value="0" type="number" placeholder="задержка между сериями" max="10" min="0"/>
-			количество армий в серии <input name="seriesArmyCount" value="1" type="number" placeholder="количество армий в серии" max="10" min="1"/>
-		</div>
+					<label for="js-unit-id">юнит:</label>
+					<select name="unitId" id="js-unit-id" class="hor-margin-between-inputs">
+						<!--first level-->
+						<option value="3">солдат</option>
+						<option value="4">гренадёр</option>
+						<option value="5">камикадзе</option>
+						<option value="6">ветеран</option>
+						<option value="7">стражник</option>
+						<option value="69">огнемётчик</option>
+						<!--second level-->
+						<option value="9">танк</option>
+						<option value="10">миномёт</option>
+						<option value="11">снайпер</option>
+						<option value="12">гладиатор</option>
+						<option value="13">ракеткная уст.</option>
+						<option value="14">штурмовик</option>
+						<option value="52">транспорт</option>
+					</select>
+					<input id="js-only-create" name="onlyCreate" type="checkbox"/><label for="js-only-create">только создать</label>
+				</div>
+				<div id="js-send-army-panel">
+					<div class="v-marign-between-blocks">
+						<label for="js-ring">Цель: </label>
+						<select id="js-ring" name="ring" class="hor-margin-between-inputs">
+							<option value="1">ворания</option>
+							<option value="2">лиенсорд</option>
+							<option value="3">псолеон</option>
+							<option value="4">мельсион</option>
+						</select>
+						<input id="js-compl" name="compl" type="number" placeholder="компл" max="2000" min="1" class="js-prevalidate four-simbol-width hor-margin-between-inputs"/>
+						<select id="js-sota" name="sota" class="hor-margin-between-inputs">
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+						</select>
+						<select id="js-last-enemy" class="hide"></select>
+					</div>
+					<div class="v-marign-between-blocks">
+						<label for="js-delay">Интервал между сериями: </label><input id="js-delay" name="delay" value="0" type="number" max="10" min="0" class="js-prevalidate two-simbol-width hor-margin-between-inputs"/>
+						<label for="js-series-army-count">армий в серии: </label><input id="js-series-army-count" name="seriesArmyCount" value="1" type="number" max="10" min="1" class="js-prevalidate two-simbol-width"/>
+					</div>
+				</div>
 
-		<button name="spamStart" value="start" id="spamStart" class="js-spam-start">пуск!</button>
+				<button name="spamStart" value="start" id="js-spam-start" class="v-marign-between-blocks l-margin-for-spam-button">пуск!</button>
 
-		<div>
-			<textarea rows="10" cols="100" id='log' class="js-log"></textarea>
+				<div class="text-center">
+					<textarea rows="10" cols="100" id="js-log" readonly="readonly" class="text-area"></textarea>
+					<span id="js-clear-log" class="clear-log">очистить лог</span>
+				</div>
+			</div>
 		</div>
+	<script src="panel.js"></script>
 	</body>
 
 </html>
