@@ -1,4 +1,3 @@
-//@TODO replace id to js-class
 
 (function(){
 
@@ -74,6 +73,7 @@
 			parseInt(document.getElementById("js-compl").value),
 			parseInt(document.getElementById("js-sota").value)
 		);
+		lastEnemies();
 
 		self.port.emit("spamStart", {
 			countArmy: parseInt(document.getElementById("js-count-army").value),
@@ -104,10 +104,28 @@
 	})();
 
 	//вывод последних врагов
-	(function(){
+	function lastEnemies(){
 		var enemies= history.getAll();
 		var select = document.getElementById("js-last-enemy");
+		//удаление старых опшенов
+		while(select.lastChild) {
+			select.removeChild(select.lastChild);
+		}
+
 		if (enemies.length !== 0){
+			//отбор уникальных врагов - как это работает??
+			for (var i=0; i<enemies.length-1; i++){
+				if (enemies[i].ring == enemies[i+1].ring){
+					delete enemies[i];
+				}
+			}
+			enemies = enemies.filter( function( el ){return (typeof el !== "undefined");} );
+
+			//перевернуть массив
+			enemies.reverse();
+			//@TODO обрезание до 10 последних
+			enemies = enemies.splice(0,10);
+
 			for (var i in enemies){
 				var child = document.createElement("option");
 				child.setAttribute("ring", enemies[i].ring);
@@ -121,6 +139,7 @@
 			}
 			select.classList.remove("hide");
 		}
-	})();
+	};
 
+	lastEnemies();
 })();
