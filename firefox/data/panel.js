@@ -92,7 +92,10 @@
 
 	//очистка лога
 	document.getElementById("js-clear-log").onclick = function(){
-		document.getElementById("js-log").innerHTML = "";
+		var elem = document.getElementById("js-log");
+		while(elem.lastChild) {
+			elem.removeChild(elem.lastChild);
+		}
 	};
 
 
@@ -144,4 +147,6 @@
 			};
 		}
 	})();
+
+	//@TODO подстановка цели из истории
 })();
