@@ -14,11 +14,11 @@
 
 	History.prototype.add = function(ring, compl, sota){
 		var temp = JSON.parse(this._storage.lastEnemies);
-		var currentAdress = String(ring+','+compl+','+sota);
+		var currentAdress = String(ring+','+compl+','+sota); //wtf
 
-		//перебор адресов хрянящихся в localStorage
+		//перебор адресов хрянящихся в localStorage//wtf
 		for (var i in temp){
-			var lastAdress = String(temp[i].ring+','+temp[i].compl+','+temp[i].sota);
+			var lastAdress = String(temp[i].ring+','+temp[i].compl+','+temp[i].sota);//wtf
 			//удаление повторяющихся объектов
 			if (currentAdress === lastAdress){
 				temp.splice(i,1);
@@ -27,11 +27,11 @@
 		//добавление в начало последнего адреса
 		temp.unshift({ring:ring,compl:compl,sota:sota});
 
-		//проверка длинны, оставляем только 10 последних врагов
+		//проверка длинны, оставляем только 10 последних врагов //wtf
 		if (temp.length > 10){
 			temp.pop();
 		}
-		this._storage.lastEnemies = JSON.stringify([]);
+		this._storage.lastEnemies = JSON.stringify([]);//wtf
 		this._storage.lastEnemies = JSON.stringify(temp);
 	};
 
@@ -40,7 +40,7 @@
 	};
 
 	//вывод последних врагов
-	function lastEnemies(){
+	function initLastEnemySelector(){
 		var history = new History();
 		var enemies= history.getAll();
 		var select = document.getElementById("js-last-enemy");
@@ -66,7 +66,7 @@
 		}
 	};
 
-	lastEnemies();
+	initLastEnemySelector();
 
 	//открываем управляющую панель при событии
 	self.port.on("show-panel", function(){
@@ -115,7 +115,7 @@
 			parseInt(document.getElementById("js-sota").value)
 		);
 
-		lastEnemies();
+		initLastEnemySelector();
 
 		self.port.emit("spamStart", {
 			countArmy: parseInt(document.getElementById("js-count-army").value),
