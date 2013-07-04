@@ -13,11 +13,26 @@
 		}
 	};
 
-	//@ToDo хранить последние 10
-	//@ToDo хранить уникальные
 	History.prototype.add = function(ring, compl, sota){
 		var temp = JSON.parse(this._storage.lastEnemies);
-		temp.push({ring:ring,compl:compl,sota:sota});
+		var currentAdress = String(ring+','+compl+','+sota);
+
+		//перебор адресов хрянящихся в localStorage
+		for (var i in temp){
+			var lastAdress = String(temp[i].ring+','+temp[i].compl+','+temp[i].sota);
+			//удаление повторяющихся объектов
+			if (currentAdress == lastAdress){
+				temp.splice(i,1);
+			}
+		}
+		//добавление в начало последнего адреса
+		temp.unshift({ring:ring,compl:compl,sota:sota});
+
+		//проверка длинны, оставляем только 10 последних врагов
+		if (temp.length > 10){
+			temp.pop();
+		}
+		this._storage.lastEnemies = JSON.stringify([]);
 		this._storage.lastEnemies = JSON.stringify(temp);
 	};
 
@@ -25,7 +40,35 @@
 		return JSON.parse(this._storage.lastEnemies);
 	};
 
-	var history = new History();
+	//вывод последних врагов
+	function lastEnemies(){
+		var history = new History();
+		var enemies= history.getAll();
+		var select = document.getElementById("js-last-enemy");
+
+		//удаление старых опшенов
+		while(select.lastChild) {
+			select.removeChild(select.lastChild);
+		}
+
+		if (enemies.length !== 0){
+			for (var i in enemies){
+				var child = document.createElement("option");
+				child.setAttribute("ring", enemies[i].ring);
+				child.setAttribute("compl", enemies[i].compl);
+				child.setAttribute("sota", enemies[i].sota);
+
+				var text = document.createTextNode([enemies[i].ring, enemies[i].compl, enemies[i].sota].join('.'));
+				child.appendChild(text);
+				select.appendChild(child);
+
+			}
+			select.classList.remove("hide");
+		}
+	};
+
+	lastEnemies();
+
 
 
 	//открываем управляющую панель при событии
@@ -68,6 +111,7 @@
 	//кнопка пуск
 	document.getElementById("js-spam-start").onclick = function() {
 		console.log('spamStart button fire');
+		var history = new History();
 		history.add(
 			parseInt(document.getElementById("js-ring").value),
 			parseInt(document.getElementById("js-compl").value),
@@ -84,7 +128,7 @@
 			ring: parseInt(document.getElementById("js-ring").value),
 			compl: parseInt(document.getElementById("js-compl").value),
 			sota: parseInt(document.getElementById("js-sota").value)
-		});
+		}); 
 	};
 
 	//привидение цифровых значений к допустимым максимуму и минимуму
@@ -102,44 +146,4 @@
 			}
 		}
 	})();
-
-	//вывод последних врагов
-	function lastEnemies(){
-		var enemies= history.getAll();
-		var select = document.getElementById("js-last-enemy");
-		//удаление старых опшенов
-		while(select.lastChild) {
-			select.removeChild(select.lastChild);
-		}
-
-		if (enemies.length !== 0){
-			//отбор уникальных врагов - как это работает??
-			for (var i=0; i<enemies.length-1; i++){
-				if (enemies[i].ring == enemies[i+1].ring){
-					delete enemies[i];
-				}
-			}
-			enemies = enemies.filter( function( el ){return (typeof el !== "undefined");} );
-
-			//перевернуть массив
-			enemies.reverse();
-			//@TODO обрезание до 10 последних
-			enemies = enemies.splice(0,10);
-
-			for (var i in enemies){
-				var child = document.createElement("option");
-				child.setAttribute("ring", enemies[i].ring);
-				child.setAttribute("compl", enemies[i].compl);
-				child.setAttribute("sota", enemies[i].sota);
-
-				var text = document.createTextNode([enemies[i].ring, enemies[i].compl, enemies[i].sota].join('.'));
-				child.appendChild(text);
-				select.appendChild(child);
-
-			}
-			select.classList.remove("hide");
-		}
-	};
-
-	lastEnemies();
 })();
