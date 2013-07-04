@@ -132,6 +132,16 @@
 		});
 	};
 
+	//подстановка цели из истории
+	document.getElementById('js-last-enemy').onchange = function(){
+		var selectedEnemy = this.options[this.selectedIndex];
+
+		document.getElementById('js-ring').selectedIndex = selectedEnemy.getAttribute('ring')-1;
+		document.getElementById('js-compl').value = selectedEnemy.getAttribute('compl');
+		document.getElementById('js-sota').selectedIndex = selectedEnemy.getAttribute('sota')-1;
+
+	};
+
 	//привидение цифровых значений к допустимым максимуму и минимуму
 	(function(){
 		var elems = document.getElementsByClassName("js-prevalidate");
@@ -148,5 +158,4 @@
 		}
 	})();
 
-	//@TODO подстановка цели из истории
 })();
