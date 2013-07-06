@@ -126,7 +126,7 @@
 	.main-block{
 		background:#f9fafb url("img/fon.png") top right no-repeat;
 		padding: 26px 18px 31px;
-		height: 75%;
+		height: 77%;
 	}
 	.tab li{
 		width: 84px;
@@ -159,6 +159,9 @@
 	}
 	.text-area{
 		width: 100%;
+	}
+	.block-clear-log{
+		margin-bottom: 7px;
 	}
 	.clear-log{
 		cursor: pointer;
