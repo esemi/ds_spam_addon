@@ -17,7 +17,7 @@ myWidget.prototype.create =  function(){
 
 	this._panel = require("sdk/panel").Panel({
 		width:750,
-		height:400,
+		height:407,
 		contentURL: self.data.url("panel.html"),
 		contentScriptFile: self.data.url('panel.js'),
 		contentScriptWhen: 'ready'

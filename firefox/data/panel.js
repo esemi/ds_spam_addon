@@ -14,11 +14,11 @@
 
 	History.prototype.add = function(ring, compl, sota){
 		var temp = JSON.parse(this._storage.lastEnemies);
-		var currentAdress = String(ring+','+compl+','+sota); //wtf
+		var currentAdress = ring + ',' + compl + ',' + sota;
 
-		//перебор адресов хрянящихся в localStorage//wtf
+		//перебор адресов хрянящихся в localStorage
 		for (var i in temp){
-			var lastAdress = String(temp[i].ring+','+temp[i].compl+','+temp[i].sota);//wtf
+			var lastAdress = temp[i].ring + ',' + temp[i].compl + ',' + temp[i].sota;
 			//удаление повторяющихся объектов
 			if (currentAdress === lastAdress){
 				temp.splice(i,1);
@@ -27,11 +27,9 @@
 		//добавление в начало последнего адреса
 		temp.unshift({ring:ring,compl:compl,sota:sota});
 
-		//проверка длинны, оставляем только 10 последних врагов //wtf
-		if (temp.length > 10){
-			temp.pop();
-		}
-		this._storage.lastEnemies = JSON.stringify([]);//wtf
+		//проверка длинны, оставляем только 10 последних врагов
+		temp = temp.splice(0,10);
+
 		this._storage.lastEnemies = JSON.stringify(temp);
 	};
 
@@ -111,12 +109,15 @@
 	//кнопка пуск
 	document.getElementById("js-spam-start").onclick = function() {
 		console.log('spamStart button fire');
-		var history = new History();
-		history.add(
-			parseInt(document.getElementById("js-ring").value),
-			parseInt(document.getElementById("js-compl").value),
-			parseInt(document.getElementById("js-sota").value)
-		);
+
+		if (document.getElementById("js-compl").value.length !== 0 ){
+			var history = new History();
+			history.add(
+				parseInt(document.getElementById("js-ring").value),
+				parseInt(document.getElementById("js-compl").value),
+				parseInt(document.getElementById("js-sota").value)
+			);
+		}
 
 		initLastEnemySelector();
 
@@ -130,6 +131,16 @@
 			compl: parseInt(document.getElementById("js-compl").value),
 			sota: parseInt(document.getElementById("js-sota").value)
 		});
+	};
+
+	//подстановка цели из истории
+	document.getElementById('js-last-enemy').onchange = function(){
+		var selectedEnemy = this.options[this.selectedIndex];
+
+		document.getElementById('js-ring').selectedIndex = selectedEnemy.getAttribute('ring')-1;
+		document.getElementById('js-compl').value = selectedEnemy.getAttribute('compl');
+		document.getElementById('js-sota').selectedIndex = selectedEnemy.getAttribute('sota')-1;
+
 	};
 
 	//привидение цифровых значений к допустимым максимуму и минимуму
@@ -148,5 +159,4 @@
 		}
 	})();
 
-	//@TODO подстановка цели из истории
 })();
