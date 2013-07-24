@@ -23,7 +23,7 @@ var gameClient = function(){
 /**
  * Init game client by url
  *
- * @param string Current tab url (must be game url example http://www.dsga.me/ds/index.php?ck=5xt7xLNacS&VERS=RU_CLASSIC&sport=17441&SIDIX=v0mb4o1n1rgbf5lvh5mm6kbui2)
+ * @param string Current tab url (must be game url example http://www.dsga.me/ds/index.php?ck=5xt7xLNacS&VERS=RU_CLASSIC&sport=17441&PHPSESSID=v0mb4o1n1rgbf5lvh5mm6kbui2)
  * @returns boolean Success initiated flag
  */
 gameClient.prototype.init = function(currentUrl){
@@ -40,7 +40,7 @@ gameClient.prototype.init = function(currentUrl){
 			this._ck = ckMatches[1];
 		}
 
-		var ssMatches = /SIDIX=([\w\d]{26})/.exec(url.path);
+		var ssMatches = /PHPSESSID=([\w\d]{26})/.exec(url.path);
 		if( ssMatches !== null && ssMatches.length === 2 )
 			this._sessid = ssMatches[1];
 	}
@@ -304,7 +304,7 @@ gameClient.prototype._parseArmyOverviewResponse = function(content, armyNames){
 };
 
 gameClient.prototype._getActionUrl = function(){
-	return this._baseUrl + '/ds/useraction.php?SIDIX=' + encodeURIComponent(this._sessid);
+	return this._baseUrl + '/ds/useraction.php?PHPSESSID=' + encodeURIComponent(this._sessid);
 };
 
 
