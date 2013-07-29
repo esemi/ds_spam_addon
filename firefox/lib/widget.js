@@ -24,8 +24,8 @@ myWidget.prototype.create =  function(){
 	});
 
 	this._widget = WIDGET.Widget({
-		id: "dsSpamWidget",
-		label: "DS spam",
+		id: "dsCheaterWidget",
+		label: "DS cheater",
 		contentURL: self.data.url("img/16.png"),
 		panel: this._panel
 	});
@@ -279,7 +279,7 @@ spamCallback.prototype.end = function( message ){
 	this.log('end message: ' + message);
 
 	NOTIFICATIONS.notify({
-		title: 'ds_spam',
+		title: 'ds_cheater',
 		text: 'Work ended with message "' + message + '"'
 	});
 };
