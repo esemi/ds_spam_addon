@@ -10,6 +10,8 @@ var myLibs = require('./libs.js');
 var BaseCallback = function(panel, client){
 	this._panel = panel;
 	this._client = client;
+	this._listenersInited = false;
+	this._opt;
 };
 
 BaseCallback.prototype.log = function(message){
@@ -52,15 +54,44 @@ BaseCallback.prototype.end = function( message ){
 	});
 };
 
+BaseCallback.prototype.initListeners = function(worker){
+	console.log("init listeners of " + this._listenersInited);
+	if( !this._listenersInited ){
+		this._listenersInited = true;
+		var _self = this;
+
+		EVENTS.on(this, "gettingCk", function(){
+			worker.port.emit('get-сk');
+		});
+
+		EVENTS.on(this, "startWork", function(){
+			worker.port.emit('lock-client');
+		});
+
+		EVENTS.on(this, "endWork", function(){
+			worker.port.emit('unlock-client');
+			worker.port.emit('update-сk', _self._client.getCk());
+		});
+
+		worker.port.on("returnCk", function(ck){
+			_self.updateCK(ck);
+		});
+	}
+};
+
 
 var SpamCallback = function(panel, client){
 	SpamCallback.superclass.constructor.apply(this, arguments);
-	this._opt;
-	this._armyPrefix;
 };
 
 myLibs.extend(SpamCallback, BaseCallback);
 
+/**
+ * Parse spam send options
+ *
+ * @param array options (countArmy, unitId, onlyCreate, ring, compl, sota, delay, seriesArmyCount)
+ * @returns String|Boolean
+ */
 SpamCallback.prototype._parseOptions = function(options){
 	var intRegExp = /\d+/;
 	if( typeof options.countArmy === 'undefined' || !intRegExp.test(options.countArmy) || parseInt(options.countArmy) < 1 )
@@ -121,12 +152,12 @@ SpamCallback.prototype.findArmyBase = function(){
 
 SpamCallback.prototype.createArmy = function(){
 
-	this._armyPrefix = myLibs.randomString(10);
+	var armyPrefix = myLibs.randomString(10);
 
 	var createdArmy = [];
 	for( var i=1; i<=this._opt.countArmy; i++ )
 	{
-		var armyName = this._armyPrefix.concat(i);
+		var armyName = armyPrefix.concat(i);
 		console.log('create army ' + armyName);
 
 		//создали армию
@@ -219,8 +250,84 @@ SpamCallback.prototype.sendArmy = function(armyNames){
 };
 
 
-exports.getBase = function(){
-	return BaseCallback;
+var ArchCallback = function(panel, client){
+	ArchCallback.superclass.constructor.apply(this, arguments);
+};
+
+myLibs.extend(ArchCallback, BaseCallback);
+
+/**
+ * Parse arch send options
+ *
+ * @param array options (dest, artSize, time, groupCount, archCount)
+ * @returns String|Boolean
+ */
+ArchCallback.prototype._parseOptions = function(options){
+	var intRegExp = /\d+/;
+	if( typeof options.countArmy === 'undefined' || !intRegExp.test(options.countArmy) || parseInt(options.countArmy) < 1 )
+		return 'Invalid army count';
+
+	if( typeof options.unitId === 'undefined' || !intRegExp.test(options.unitId) || parseInt(options.unitId) < 1 )
+		return 'Invalid unit id';
+
+	if( typeof options.onlyCreate === 'undefined' )
+		return 'Invalid "create only" flag';
+
+	if( !options.onlyCreate )
+	{
+		if( typeof options.ring === 'undefined' || !intRegExp.test(options.ring) || parseInt(options.ring) < 1 ||  parseInt(options.ring) > 4 )
+			return 'Invalid ring';
+
+		if( typeof options.compl === 'undefined' || !intRegExp.test(options.compl) || parseInt(options.compl) < 1 )
+			return 'Invalid compl';
+
+		if( typeof options.sota === 'undefined' || !intRegExp.test(options.sota) || parseInt(options.sota) < 1 ||  parseInt(options.sota) > 6 )
+			return 'Invalid sota';
+
+		if( typeof options.delay === 'undefined' || !intRegExp.test(options.delay) || parseInt(options.delay) < 0 ||  parseInt(options.delay) > 10 )
+			return 'Invalid delay';
+
+		if( typeof options.seriesArmyCount === 'undefined' || !intRegExp.test(options.seriesArmyCount) || parseInt(options.seriesArmyCount) < 1 ||  parseInt(options.seriesArmyCount) > 10 )
+			return 'Invalid series army count';
+	}
+
+	this._opt = options;
+
+	var mess = 'start task for ' + this._opt.countArmy + ' army by unit id ' + this._opt.unitId;
+	console.log(mess);
+	this.log(mess);
+
+	return true;
+};
+
+ArchCallback.prototype.continueAfterUpdateCK = function(){
+	this.prepareArchGroups();
+};
+
+ArchCallback.prototype.prepareArchGroups = function(){
+	var res = this._client.loadBuildMap();
+	if( res !== true ){
+		return this.end('loading build map failed');
+	}
+	this.log('loading build map success');
+
+	var archCount = this._client.getArchCount();
+	if( archCount === null || archCount === 0 ){
+		return this.end('not found arch on sota');
+	}
+	this.log('found ' + archCount + ' arch');
+
+	//@TODO release prepare arch group
+
+	this.sendArch();
+};
+
+ArchCallback.prototype.sendArch = function(){
+	//@TODO release
+};
+
+exports.getArch = function(){
+	return ArchCallback;
 };
 exports.getSpam = function(){
 	return SpamCallback;

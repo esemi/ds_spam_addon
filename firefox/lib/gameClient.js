@@ -14,6 +14,7 @@ var gameClient = function(){
 	this._lastMessage = '';
 	this._minArmySpeed = 50;
 	this._maxArmySpeed = 150;
+	this._archCount = 0;
 	this._map = {
 		'armyBase': null, //26 code
 		'mainBuilding': 127
@@ -59,7 +60,7 @@ gameClient.prototype.init = function(currentUrl){
 };
 
 /**
- * Loading buildings map
+ * Loading buildings map and global values (arch count & others)
  *
  * @returns boolean
  */
@@ -94,7 +95,7 @@ gameClient.prototype.loadBuildMap = function(){
 /**
  * Loading army base buildMenu
  *
- * @param array armyNames Array of army names
+ * @param {array} armyNames Array of army names
  * @returns mixed Array of army ids or False if failed
  */
 gameClient.prototype.loadArmyOverview = function(armyNames){
@@ -126,8 +127,8 @@ gameClient.prototype.loadArmyOverview = function(armyNames){
 /**
  * Create army from single unit
  *
- * @param int unitId Id unit for create spam army
- * @param string army Army name for create
+ * @param {int} unitId Id unit for create spam army
+ * @param {string} army Army name for create
  * @returns mixed
  */
 gameClient.prototype.createArmy = function(unitId, army){
@@ -158,8 +159,9 @@ gameClient.prototype.createArmy = function(unitId, army){
 /**
  * Send army to address
  *
- * @param int armyId
- * @param string addr Army destination in format %d.%d.%d
+ * @param {int} armyId
+ * @param {string} addr Army destination in format %d.%d.%d
+ * @param {int} speed
  * @returns mixed
  */
 gameClient.prototype.sendArmy = function(armyId, addr, speed){
@@ -198,6 +200,9 @@ gameClient.prototype.getMinArmySpeed = function(){
 };
 gameClient.prototype.getMaxArmySpeed = function(){
 	return this._maxArmySpeed;
+};
+gameClient.prototype.getArchCount = function(){
+	return this._archCount;
 };
 gameClient.prototype.isInitiated = function(){
 	return this._isInititated;
@@ -246,7 +251,6 @@ gameClient.prototype._parseSendArmyResponse = function(content){
 
 gameClient.prototype._parseBuildMapResponse = function(content){
 	var matches = /<build>(.*)<\/build>/.exec(content);
-
 	if( matches === null || matches.length !== 2 ){
 		return false;
 	}
@@ -261,6 +265,13 @@ gameClient.prototype._parseBuildMapResponse = function(content){
 		if( t[2] === '26' ) //army base
 			this._map.armyBase = parseInt(t[1]) + 1;
 	}
+
+	var matches = /<ARCHEOLOGIST\scurrent="(\d+)"/.exec(content);
+	if( matches === null || matches.length !== 2 ){
+		console.log('not parsed arch count' + matches);
+		return false;
+	}
+	this._archCount = parseInt(matches[1]);
 
 	return true;
 };
