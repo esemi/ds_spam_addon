@@ -13,3 +13,11 @@ exports.randomString = function(length){
 		result += chars[Math.round(Math.random() * (chars.length - 1))];
 	return result;
 };
+
+exports.extend = function(Child, Parent){
+	var F = function(){};
+	F.prototype = Parent.prototype;
+	Child.prototype = new F();
+	Child.prototype.constructor = Child;
+	Child.superclass = Parent.prototype;
+};

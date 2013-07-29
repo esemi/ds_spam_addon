@@ -245,7 +245,7 @@ gameClient.prototype._parseSendArmyResponse = function(content){
 };
 
 gameClient.prototype._parseBuildMapResponse = function(content){
-	var matches = /<build>([\d\^]*)<\/build>/.exec(content);
+	var matches = /<build>(.*)<\/build>/.exec(content);
 
 	if( matches === null || matches.length !== 2 ){
 		return false;
