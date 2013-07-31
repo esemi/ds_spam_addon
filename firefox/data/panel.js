@@ -1,5 +1,8 @@
 (function(){
 
+	/*******************************************SPAM SEND***************************************************************/
+
+
 	function History(){
 		if( typeof(Storage) !== "undefined" ){
 			this._storage = localStorage;
@@ -66,6 +69,73 @@
 
 	initLastEnemySelector();
 
+	//удалять кнопочки при включенной галочке
+	document.getElementById("js-only-create").onchange = function(){
+		if (this.checked){
+			document.getElementById("js-send-army-panel").classList.add("hide");
+		}else{
+			document.getElementById("js-send-army-panel").classList.remove("hide");
+		}
+	};
+
+	//кнопка пуска спама
+	document.getElementById("js-spam-start").onclick = function() {
+		console.log('spamStart button fire');
+
+		if (document.getElementById("js-compl").value.length !== 0 ){
+			var history = new History();
+			history.add(
+				parseInt(document.getElementById("js-ring").value),
+				parseInt(document.getElementById("js-compl").value),
+				parseInt(document.getElementById("js-sota").value)
+			);
+		}
+
+		initLastEnemySelector();
+
+		self.port.emit("spamStart", {
+			countArmy: parseInt(document.getElementById("js-count-army").value),
+			unitId: parseInt(document.getElementById("js-unit-id").value),
+			onlyCreate: document.getElementById("js-only-create").checked,
+			delay: parseInt(document.getElementById("js-delay").value),
+			seriesArmyCount: parseInt(document.getElementById("js-series-army-count").value),
+			ring: parseInt(document.getElementById("js-ring").value),
+			compl: parseInt(document.getElementById("js-compl").value),
+			sota: parseInt(document.getElementById("js-sota").value)
+		});
+	};
+
+	//подстановка цели спама из истории
+	document.getElementById('js-last-enemy').onchange = function(){
+		var selectedEnemy = this.options[this.selectedIndex];
+
+		document.getElementById('js-ring').selectedIndex = selectedEnemy.getAttribute('ring')-1;
+		document.getElementById('js-compl').value = selectedEnemy.getAttribute('compl');
+		document.getElementById('js-sota').selectedIndex = selectedEnemy.getAttribute('sota')-1;
+
+	};
+
+
+	/*******************************************ARCH SEND***************************************************************/
+
+
+	//кнопка отправки архов
+	document.getElementById("js-arch-start").onclick = function() {
+		console.log('archStart button fire');
+
+		self.port.emit("archSendStart", {
+			dest: document.getElementById("js-arch-dest").value,
+			artSize: parseInt(document.getElementById("js-arch-art-size").value),
+			time: parseInt(document.getElementById("js-arch-time").value),
+			groupCount: parseInt(document.getElementById("js-arch-group-count").value),
+			archCount: parseInt(document.getElementById("js-arch-arch-count").value)
+		});
+	};
+
+
+	/****************************others**************************************************************************************/
+
+
 	//открываем управляющую панель при событии
 	self.port.on("show-panel", function(){
 		console.log('show panel port on');
@@ -94,53 +164,6 @@
 		while(elem.lastChild) {
 			elem.removeChild(elem.lastChild);
 		}
-	};
-
-
-	//удалять кнопочки при включенной галочке
-	document.getElementById("js-only-create").onchange = function(){
-		if (this.checked){
-			document.getElementById("js-send-army-panel").classList.add("hide");
-		}else{
-			document.getElementById("js-send-army-panel").classList.remove("hide");
-		}
-	};
-
-	//кнопка пуск
-	document.getElementById("js-spam-start").onclick = function() {
-		console.log('spamStart button fire');
-
-		if (document.getElementById("js-compl").value.length !== 0 ){
-			var history = new History();
-			history.add(
-				parseInt(document.getElementById("js-ring").value),
-				parseInt(document.getElementById("js-compl").value),
-				parseInt(document.getElementById("js-sota").value)
-			);
-		}
-
-		initLastEnemySelector();
-
-		self.port.emit("spamStart", {
-			countArmy: parseInt(document.getElementById("js-count-army").value),
-			unitId: parseInt(document.getElementById("js-unit-id").value),
-			onlyCreate: document.getElementById("js-only-create").checked,
-			delay: parseInt(document.getElementById("js-delay").value),
-			seriesArmyCount: parseInt(document.getElementById("js-series-army-count").value),
-			ring: parseInt(document.getElementById("js-ring").value),
-			compl: parseInt(document.getElementById("js-compl").value),
-			sota: parseInt(document.getElementById("js-sota").value)
-		});
-	};
-
-	//подстановка цели из истории
-	document.getElementById('js-last-enemy').onchange = function(){
-		var selectedEnemy = this.options[this.selectedIndex];
-
-		document.getElementById('js-ring').selectedIndex = selectedEnemy.getAttribute('ring')-1;
-		document.getElementById('js-compl').value = selectedEnemy.getAttribute('compl');
-		document.getElementById('js-sota').selectedIndex = selectedEnemy.getAttribute('sota')-1;
-
 	};
 
 	//привидение цифровых значений к допустимым максимуму и минимуму
