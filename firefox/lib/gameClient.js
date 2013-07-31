@@ -162,6 +162,7 @@ gameClient.prototype.createArmy = function(unitId, army){
  * @param {int} armyId
  * @param {string} addr Army destination in format %d.%d.%d
  * @param {int} speed
+ * 
  * @returns mixed
  */
 gameClient.prototype.sendArmy = function(armyId, addr, speed){
@@ -182,6 +183,42 @@ gameClient.prototype.sendArmy = function(armyId, addr, speed){
 
 	//console.log(request.responseText);
 	var res = this._parseSendArmyResponse(request.responseText);
+	if( res !== true ){
+		return 'Not parsed send army message: ' + request.responseText;
+	}
+
+	return true;
+};
+
+
+/**
+ * Send archs to expedition
+ *
+ * @param {string} dest Destination (HOME|CENTRAL|NEUTRAL)
+ * @param {int} archCount
+ * @param {int} time
+ * @param {int} size
+ *
+ * @returns mixed
+ */
+gameClient.prototype.sendArchGroup = function(dest, archCount, time, size){
+	var params = myLibs.encodePostParams({
+		"ck": this._ck,
+		"onLoad": "[type Function]",
+		"xmldata": '<archeologyteam dest="' + dest + '" count="' + archCount + '" time="' + time + '" size="' + size + '" countgroup="1"/>'
+	});
+	var request = new XHR();
+	request.open('POST', this._getActionUrl(), false);
+	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	request.send(params);
+
+	var res = this._parseCk(request.responseText);
+	if( res !== true ){
+		return 'Not parsed new ck: ' + request.responseText;
+	}
+
+	//console.log(request.responseText);
+	var res = this._parseSendArchGroupResponse(request.responseText);
 	if( res !== true ){
 		return 'Not parsed send army message: ' + request.responseText;
 	}
@@ -238,6 +275,19 @@ gameClient.prototype._parseCreateArmyResponse = function(content){
 
 gameClient.prototype._parseSendArmyResponse = function(content){
 	var matches = /<sysmsg><w>(.*)<\/w><\/sysmsg>/.exec(content);
+
+	if( matches !== null && matches.length === 2 )
+	{
+		this._lastMessage = matches[1].replace(/\{([^}]*)\}/g, '');
+		return true;
+	}else{
+		this._lastMessage = '';
+		return false;
+	}
+};
+
+gameClient.prototype._parseSendArchGroupResponse = function(content){
+	var matches = /<sysmsg><m>(.*)<\/m><\/sysmsg>/.exec(content);
 
 	if( matches !== null && matches.length === 2 )
 	{

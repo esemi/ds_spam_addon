@@ -4,6 +4,8 @@ var NOTIFICATIONS = require("sdk/notifications");
 var myLibs = require('./libs.js');
 
 /**
+ * @param {object} panel
+ * @param {object} client
  * @abstract continueAfterUpdateCK()
  * @abstract _parseOptions(opt)
  */
@@ -89,7 +91,7 @@ myLibs.extend(SpamCallback, BaseCallback);
 /**
  * Parse spam send options
  *
- * @param array options (countArmy, unitId, onlyCreate, ring, compl, sota, delay, seriesArmyCount)
+ * @param {array} options (countArmy, unitId, onlyCreate, ring, compl, sota, delay, seriesArmyCount)
  * @returns String|Boolean
  */
 SpamCallback.prototype._parseOptions = function(options){
@@ -259,41 +261,29 @@ myLibs.extend(ArchCallback, BaseCallback);
 /**
  * Parse arch send options
  *
- * @param array options (dest, artSize, time, groupCount, archCount)
+ * @param {array} options (dest, artSize, time, groupCount, archCount)
  * @returns String|Boolean
  */
 ArchCallback.prototype._parseOptions = function(options){
 	var intRegExp = /\d+/;
-	if( typeof options.countArmy === 'undefined' || !intRegExp.test(options.countArmy) || parseInt(options.countArmy) < 1 )
-		return 'Invalid army count';
+	if( typeof options.artSize === 'undefined' || !intRegExp.test(options.artSize) || parseInt(options.artSize) < 1 || parseInt(options.artSize) > 6 )
+		return 'Invalid art size';
 
-	if( typeof options.unitId === 'undefined' || !intRegExp.test(options.unitId) || parseInt(options.unitId) < 1 )
-		return 'Invalid unit id';
+	if( typeof options.time === 'undefined' || !intRegExp.test(options.time) || [1,2,3,5,8,12].indexOf(options.time) < 0 )
+		return 'Invalid time';
 
-	if( typeof options.onlyCreate === 'undefined' )
-		return 'Invalid "create only" flag';
+	if( typeof options.dest === 'undefined' || ['HOME', 'CENTRAL', 'NEUTRAL'].indexOf(options.dest) < 0 )
+		return 'Invalid destination';
 
-	if( !options.onlyCreate )
-	{
-		if( typeof options.ring === 'undefined' || !intRegExp.test(options.ring) || parseInt(options.ring) < 1 ||  parseInt(options.ring) > 4 )
-			return 'Invalid ring';
+	if( typeof options.groupCount === 'undefined' || !intRegExp.test(options.groupCount) || parseInt(options.groupCount) < 1 )
+		return 'Invalid group count';
 
-		if( typeof options.compl === 'undefined' || !intRegExp.test(options.compl) || parseInt(options.compl) < 1 )
-			return 'Invalid compl';
-
-		if( typeof options.sota === 'undefined' || !intRegExp.test(options.sota) || parseInt(options.sota) < 1 ||  parseInt(options.sota) > 6 )
-			return 'Invalid sota';
-
-		if( typeof options.delay === 'undefined' || !intRegExp.test(options.delay) || parseInt(options.delay) < 0 ||  parseInt(options.delay) > 10 )
-			return 'Invalid delay';
-
-		if( typeof options.seriesArmyCount === 'undefined' || !intRegExp.test(options.seriesArmyCount) || parseInt(options.seriesArmyCount) < 1 ||  parseInt(options.seriesArmyCount) > 10 )
-			return 'Invalid series army count';
-	}
+	if( typeof options.archCount === 'undefined' || !intRegExp.test(options.archCount) || parseInt(options.archCount) < 1 )
+		return 'Invalid arch count';
 
 	this._opt = options;
 
-	var mess = 'start task for ' + this._opt.countArmy + ' army by unit id ' + this._opt.unitId;
+	var mess = 'start task ' + this._opt.groupCount + ' group by ' + this._opt.archCount + ' arch-s to ' + this._opt.dest + ' an ' + this._opt.time + ' hours and ' + this._opt.artSize + ' art size';
 	console.log(mess);
 	this.log(mess);
 
@@ -311,19 +301,50 @@ ArchCallback.prototype.prepareArchGroups = function(){
 	}
 	this.log('loading build map success');
 
-	var archCount = this._client.getArchCount();
-	if( archCount === null || archCount === 0 ){
+	var archCountSota = this._client.getArchCount();
+	if( archCountSota === null || archCountSota === 0 ){
 		return this.end('not found arch on sota');
 	}
-	this.log('found ' + archCount + ' arch');
+	this.log('found ' + archCountSota + ' arch on sota');
 
-	//@TODO release prepare arch group
+	//prepare arch groups
+	if(this._opt.archCount > archCountSota) //парень указал архов в одну группу больше чем на соте всего
+	{
+		this._opt.archCount = archCountSota;
+		this._opt.groupCount = 1;
+		this.log('decrease arch-s by count on sota: arch ' + this._opt.archCount + ' and group ' + this._opt.groupCount);
+	}else if( this._opt.groupCount > Math.floor(archCountSota / this._opt.archCount) ){ //с количеством архов всё ок - проверяем кол-во груп
+		this._opt.groupCount  = Math.floor(archCountSota / this._opt.archCount);
+		this.log('decrease arch groups by count on sota: arch ' + this._opt.archCount + ' and group ' + this._opt.groupCount);
+	}
 
 	this.sendArch();
 };
 
 ArchCallback.prototype.sendArch = function(){
-	//@TODO release
+
+	this.log('start send ' + this._opt.groupCount + ' arch groups');
+
+	for( var i = 0; i < this._opt.groupCount; i++ ){
+		//отправили армию
+		var res = this._client.sendArchGroup(this._opt.dest, this._opt.archCount, this._opt.time, this._opt.artSize);
+		if(res !== true){
+			console.log('fail send arch group: ' + res);
+			this.log('fail send arch group: ' + res);
+			break;
+		}
+
+		console.log(this._client.getLastMessage());
+		this.log('server response: ' + this._client.getLastMessage());
+		if( ! /отправлена\sна\sпоиски\sв\sрайон/.test(this._client.getLastMessage()) )
+		{
+			console.log('warning message from server (send arch group)');
+			this.log('warning message from server (send arch group)');
+			break;
+		}
+	}
+
+	return this.end('end work');
 };
 
 exports.getArch = function(){

@@ -51,7 +51,6 @@ myWidget.prototype.initListeners = function(){
 			//панель готова к работе
 			_self._panel.port.emit('show-panel');
 
-			//TABS.activeTab.reload(); @FIXME exception after this code - wtf?
 			_self._worker = TABS.activeTab.attach({
 				contentScriptFile: self.data.url('game-adapter.js')
 			});
@@ -66,6 +65,13 @@ myWidget.prototype.initListeners = function(){
 		console.log("spamStart event fire");
 		_self._spamCallback.initListeners(_self._worker);
 		_self._spamCallback.start(options);
+	});
+
+	//нажатие на кнопку "отправить спам"
+	this._panel.port.on("archSendStart", function(options){
+		console.log("archSendStart event fire");
+		_self._archCallback.initListeners(_self._worker);
+		_self._archCallback.start(options);
 	});
 
 	//событие изменения ck в игровом клиенте (изменяем его и в игре)
