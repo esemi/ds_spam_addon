@@ -9,16 +9,16 @@
 
 	<body>
 		<ul class="tab">
-			<li class="active">спам</li>
-			<li class="unactive">грабли</li>
-			<li class="unactive">архи</li>
+			<li id="js-tab-spam" class="js-tab active">спам</li>
+			<li id="js-tab-arhi" class="js-tab unactive">архи</li>
+			<li id="js-tab-grabli" class="js-tab unactive">грабли</li>
 		</ul>
 		<div class="main-block">
 			<div id="js-gamepageonly-message" class="info-login text-center hide">
 				Для использования данного аддона вам необходимо зайти на соту
 			</div>
 			<div id="js-control-panel">
-				<div class="js-spam-tab">
+				<div id="js-spam-block">
 					<div class="v-marign-between-blocks">
 						<label for="js-count-army">Количество армий:</label> <input id="js-count-army" name="countArmy" value="1" type="number" max="300" min="1" class="js-prevalidate three-simbol-width hor-margin-between-inputs"/>
 
@@ -71,7 +71,7 @@
 					<button name="spamStart" value="start" id="js-spam-start" class="v-marign-between-blocks l-margin-for-spam-button">пуск!</button>
 				</div>
 
-				<div class="js-arch-tab">
+				<div id="js-arch-block" class="hide">
 					<label>Количество групп:</label> <input name="groupCount" id="js-arch-group-count" value="1" type="number" max="100" min="1" class="js-prevalidate"/><br>
 					<label>Количество архов</label> <input name="archCount" id="js-arch-arch-count" value="1" type="number" min="1" class="js-prevalidate"/><br>
 					<label>размер:</label>
@@ -100,6 +100,9 @@
 					</select><br>
 					<button name="archSendStart" id="js-arch-start" value="start">отправить</button>
 				</div>
+				<div id="js-grabli-block" class="hide">
+					<p>данный сервис еще не готов</p>
+				</div>
 
 				<div class="text-center block-clear-log">
 					<textarea rows="10" cols="100" id="js-log" readonly="readonly" class="text-area"></textarea>
@@ -107,6 +110,6 @@
 				</div>
 			</div>
 		</div>
-	<!--script src="panel.js"></script-->
+	<script src="panel.js"></script>
 	</body>
 </html>

@@ -127,6 +127,7 @@
 		background:#f9fafb url("img/fon.png") top right no-repeat;
 		padding: 26px 18px 31px;
 		height: 77%;
+		z-index: 1;
 	}
 	.tab li{
 		width: 84px;
@@ -141,7 +142,7 @@
 		color: #5C6972;
 		text-align: center;
 		text-decoration: none;
-		z-index: -1;
+		z-index: 0;
 	}
 	.tab li.active{
 		background:#f9fafb;
@@ -150,6 +151,7 @@
 	}
 	.tab li.unactive{
 		color: #dbdbdb;
+		cursor: pointer;
 	}
 
 	.info-login{

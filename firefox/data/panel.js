@@ -93,7 +93,7 @@
 
 		initLastEnemySelector();
 
-		self.port.emit("spamStart", {
+	/*	self.port.emit("spamStart", {
 			countArmy: parseInt(document.getElementById("js-count-army").value),
 			unitId: parseInt(document.getElementById("js-unit-id").value),
 			onlyCreate: document.getElementById("js-only-create").checked,
@@ -102,7 +102,7 @@
 			ring: parseInt(document.getElementById("js-ring").value),
 			compl: parseInt(document.getElementById("js-compl").value),
 			sota: parseInt(document.getElementById("js-sota").value)
-		});
+		}); */
 	};
 
 	//подстановка цели спама из истории
@@ -123,13 +123,13 @@
 	document.getElementById("js-arch-start").onclick = function() {
 		console.log('archStart button fire');
 
-		self.port.emit("archSendStart", {
+	/*	self.port.emit("archSendStart", {
 			dest: document.getElementById("js-arch-dest").value,
 			artSize: parseInt(document.getElementById("js-arch-art-size").value),
 			time: parseInt(document.getElementById("js-arch-time").value),
 			groupCount: parseInt(document.getElementById("js-arch-group-count").value),
 			archCount: parseInt(document.getElementById("js-arch-arch-count").value)
-		});
+		});*/
 	};
 
 
@@ -137,7 +137,7 @@
 
 
 	//открываем управляющую панель при событии
-	self.port.on("show-panel", function(){
+/*	self.port.on("show-panel", function(){
 		console.log('show panel port on');
 		document.getElementById("js-control-panel").classList.remove("hide");
 		document.getElementById("js-gamepageonly-message").classList.add("hide");
@@ -156,7 +156,37 @@
 		var elemLog = document.getElementById("js-log");
 		elemLog.innerHTML += d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ': ' + message + "\n";
 		elemLog.scrollTop = elemLog.scrollHeight;
-	});
+	});*/
+
+	//переключалка вкладок
+	var tabs = document.getElementsByClassName('js-tab');
+	for (var i=0; i < tabs.length; i++){
+		tabs[i].onclick = function(){
+			for (var i=0; i < tabs.length; i++){
+				tabs[i].classList.remove('active');
+				tabs[i].classList.add('unactive');
+			}
+			this.classList.remove('unactive');
+			this.classList.add('active');
+
+			//скрытие/открытие блоков
+			document.getElementById('js-spam-block').classList.add('hide');
+			document.getElementById('js-arch-block').classList.add('hide');
+			document.getElementById('js-grabli-block').classList.add('hide');
+			
+			if (this.id == 'js-tab-spam'){
+				document.getElementById('js-spam-block').classList.remove('hide');
+			}else
+			if(this.id == 'js-tab-arhi'){
+				document.getElementById('js-arch-block').classList.remove('hide');
+			}else
+			if (this.id == 'js-tab-grabli'){
+				document.getElementById('js-grabli-block').classList.remove('hide');
+			}
+		}
+	};
+
+
 
 	//очистка лога
 	document.getElementById("js-clear-log").onclick = function(){
@@ -169,7 +199,7 @@
 	//привидение цифровых значений к допустимым максимуму и минимуму
 	(function(){
 		var elems = document.getElementsByClassName("js-prevalidate");
-		for (var i in elems){
+		for (var i=0; i < elems.length; i++){
 			elems[i].onkeyup = function(){
 				var intValue = parseInt(this.value,10);
 				if (isNaN(intValue)|| intValue < this.min){
