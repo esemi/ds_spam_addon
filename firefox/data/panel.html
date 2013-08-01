@@ -9,16 +9,16 @@
 
 	<body>
 		<ul class="tab">
-			<li id="js-tab-spam" class="js-tab active">спам</li>
-			<li id="js-tab-arhi" class="js-tab unactive">архи</li>
-			<li id="js-tab-grabli" class="js-tab unactive">грабли</li>
+			<li id="js-tab-spam" tabId="spam-block" class="js-tab-button active">спам</li>
+			<li id="js-tab-arhi" class="js-tab-button unactive">архи</li>
+			<li id="js-tab-grabli" class="js-tab-button unactive">грабли</li>
 		</ul>
 		<div class="main-block">
 			<div id="js-gamepageonly-message" class="info-login text-center hide">
 				Для использования данного аддона вам необходимо зайти на соту
 			</div>
 			<div id="js-control-panel">
-				<div id="js-spam-block">
+				<div id="spam-block" class="js-tab-content">
 					<div class="v-marign-between-blocks">
 						<label for="js-count-army">Количество армий:</label> <input id="js-count-army" name="countArmy" value="1" type="number" max="300" min="1" class="js-prevalidate three-simbol-width hor-margin-between-inputs"/>
 
@@ -120,6 +120,6 @@
 				</div>
 			</div>
 		</div>
-	<script src="panel.js"></script>
+		<!--script src="panel.js"></script-->
 	</body>
 </html>
