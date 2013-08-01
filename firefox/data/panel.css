@@ -112,11 +112,14 @@
 		width: 42pt;
 	}
 
-	.v-marign-between-blocks{
+	.v-marign-between-blocks, .ul-param li{
 		margin-bottom: 12px;
 	}
 	.hor-margin-between-inputs{
 		margin-right: 8px;
+	}
+	.hor-21-margin-between-inputs{
+		margin-right: 18px;
 	}
 	.l-margin-for-spam-button{
 		margin-left: 84px;
@@ -124,6 +127,7 @@
 	/*Blocks
 -----------------------------------------------------------------------------------------------*/
 	.main-block{
+		position: relative;
 		background:#f9fafb url("img/fon.png") top right no-repeat;
 		padding: 26px 18px 31px;
 		height: 77%;
@@ -142,7 +146,6 @@
 		color: #5C6972;
 		text-align: center;
 		text-decoration: none;
-		z-index: 0;
 	}
 	.tab li.active{
 		background:#f9fafb;

@@ -72,36 +72,46 @@
 				</div>
 
 				<div id="js-arch-block" class="hide">
-					<label>Количество групп:</label> <input name="groupCount" id="js-arch-group-count" value="1" type="number" max="100" min="1" class="js-prevalidate"/><br>
-					<label>Количество архов</label> <input name="archCount" id="js-arch-arch-count" value="1" type="number" min="1" class="js-prevalidate"/><br>
-					<label>размер:</label>
-					<select name="artSize" id="js-arch-art-size">
-						<option value="1">крохотный</option>
-						<option value="2">малый</option>
-						<option value="3">средний</option>
-						<option value="4">крупный</option>
-						<option value="5">большой</option>
-						<option value="6">огромный</option>
-					</select><br>
-					<label>сота:</label>
-					<select name="dest" id="js-arch-dest">
-						<option value="HOME">домашняя</option>
-						<option value="NEUTRAL">нейтральная</option>
-						<option value="CENTRAL">центральная</option>
-					</select><br>
-					<label>время:</label>
-					<select name="time" id="js-arch-time">
-						<option value="1">1</option>
-						<option value="2">2</option>
-						<option value="3">3</option>
-						<option value="5">5</option>
-						<option value="8">8</option>
-						<option value="12">12</option>
-					</select><br>
-					<button name="archSendStart" id="js-arch-start" value="start">отправить</button>
+					<ul class="ul-param">
+						<li>
+							<label>Количество групп:</label> <input name="groupCount" id="js-arch-group-count" value="1" type="number" max="100" min="1" class="js-prevalidate three-simbol-width hor-21-margin-between-inputs"/>
+
+							<label>Количество архов:</label> <input name="archCount" id="js-arch-arch-count" value="1" type="number" min="1" class="js-prevalidate four-simbol-width"/>
+						</li>
+						<li>
+							<label>Размер:</label>
+							<select name="artSize" id="js-arch-art-size" class="hor-21-margin-between-inputs">
+								<option value="1">крохотный</option>
+								<option value="2">малый</option>
+								<option value="3">средний</option>
+								<option value="4">крупный</option>
+								<option value="5">большой</option>
+								<option value="6">огромный</option>
+							</select>
+
+							<label>сота:</label>
+							<select name="dest" id="js-arch-dest">
+								<option value="HOME">домашняя</option>
+								<option value="NEUTRAL">нейтральная</option>
+								<option value="CENTRAL">центральная</option>
+							</select>
+						</li>
+						<li>
+							<label>Время:</label>
+							<select name="time" id="js-arch-time">
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="5">5</option>
+								<option value="8">8</option>
+								<option value="12">12</option>
+							</select>
+						</li>
+					</ul>
+					<button name="archSendStart" id="js-arch-start" value="start" class="v-marign-between-blocks l-margin-for-spam-button">отправить</button>
 				</div>
 				<div id="js-grabli-block" class="hide">
-					<p>данный сервис еще не готов</p>
+					<p>Данный сервис еще не готов</p>
 				</div>
 
 				<div class="text-center block-clear-log">
