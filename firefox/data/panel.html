@@ -20,7 +20,7 @@
 			<div id="js-control-panel">
 				<div id="spam-block" class="js-tab-content">
 					<div class="v-marign-between-blocks">
-						<label for="js-count-army">Количество армий:</label> <input id="js-count-army" name="countArmy" value="1" type="number" max="300" min="1" class="js-prevalidate three-simbol-width hor-margin-between-inputs"/>
+						<label for="js-count-army">Количество армий:</label> <input id="js-count-army" name="countArmy" value="1" type="number" max="500" min="1" class="js-prevalidate three-simbol-width hor-margin-between-inputs"/>
 
 						<label for="js-unit-id">юнит:</label>
 						<select name="unitId" id="js-unit-id" class="hor-margin-between-inputs">
@@ -63,8 +63,8 @@
 							<select id="js-last-enemy" class="hide"></select>
 						</div>
 						<div class="v-marign-between-blocks">
-							<label for="js-delay">Интервал между сериями: </label><input id="js-delay" name="delay" value="0" type="number" max="10" min="0" class="js-prevalidate two-simbol-width hor-margin-between-inputs"/>
-							<label for="js-series-army-count">армий в серии: </label><input id="js-series-army-count" name="seriesArmyCount" value="1" type="number" max="10" min="1" class="js-prevalidate two-simbol-width"/>
+							<label for="js-delay">Интервал между сериями: </label><input id="js-delay" name="delay" value="0" type="number" max="20" min="0" class="js-prevalidate two-simbol-width hor-margin-between-inputs"/>
+							<label for="js-series-army-count">армий в серии: </label><input id="js-series-army-count" name="seriesArmyCount" value="1" type="number" max="50" min="1" class="js-prevalidate two-simbol-width"/>
 						</div>
 					</div>
 
@@ -74,9 +74,9 @@
 				<div id="arch-block" class="hide js-tab-content">
 					<ul class="ul-param">
 						<li>
-							<label>Количество групп:</label> <input name="groupCount" id="js-arch-group-count" value="1" type="number" max="100" min="1" class="js-prevalidate three-simbol-width hor-21-margin-between-inputs"/>
+							<label>Количество групп:</label> <input name="groupCount" id="js-arch-group-count" value="1" type="number" max="999999" min="1" class="js-prevalidate three-simbol-width hor-21-margin-between-inputs"/>
 
-							<label>Количество архов:</label> <input name="archCount" id="js-arch-arch-count" value="1" type="number" min="1" class="js-prevalidate four-simbol-width"/>
+							<label>Количество архов:</label> <input name="archCount" id="js-arch-arch-count" value="1" type="number" min="1" max="999999" class="js-prevalidate four-simbol-width"/>
 						</li>
 						<li>
 							<label>Размер:</label>
