@@ -9,9 +9,9 @@
 
 	<body>
 		<ul class="tab">
-			<li id="js-tab-spam" tabId="spam-block" class="js-tab-button active">спам</li>
-			<li id="js-tab-arhi" class="js-tab-button unactive">архи</li>
-			<li id="js-tab-grabli" class="js-tab-button unactive">грабли</li>
+			<li tabId="spam-block" class="js-tab-button active">спам</li>
+			<li tabId="arch-block" class="js-tab-button unactive">архи</li>
+			<li tabId="grabli-block" class="js-tab-button unactive">грабли</li>
 		</ul>
 		<div class="main-block">
 			<div id="js-gamepageonly-message" class="info-login text-center hide">
@@ -71,7 +71,7 @@
 					<button name="spamStart" value="start" id="js-spam-start" class="v-marign-between-blocks l-margin-for-spam-button">пуск!</button>
 				</div>
 
-				<div id="js-arch-block" class="hide">
+				<div id="arch-block" class="hide js-tab-content">
 					<ul class="ul-param">
 						<li>
 							<label>Количество групп:</label> <input name="groupCount" id="js-arch-group-count" value="1" type="number" max="100" min="1" class="js-prevalidate three-simbol-width hor-21-margin-between-inputs"/>
@@ -110,7 +110,7 @@
 					</ul>
 					<button name="archSendStart" id="js-arch-start" value="start" class="v-marign-between-blocks l-margin-for-spam-button">отправить</button>
 				</div>
-				<div id="js-grabli-block" class="hide">
+				<div id="grabli-block" class="hide js-tab-content">
 					<p>Данный сервис еще не готов</p>
 				</div>
 

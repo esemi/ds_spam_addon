@@ -170,19 +170,13 @@
 				this.classList.remove('unactive');
 				this.classList.add('active');
 
-				//скрытие/открытие блоков @FIXME work with classes and remove ids
-				document.getElementById('js-spam-block').classList.add('hide');
-				document.getElementById('js-arch-block').classList.add('hide');
-				document.getElementById('js-grabli-block').classList.add('hide');
+				//скрытие/открытие блоков
+				var tabsContent = document.getElementsByClassName('js-tab-content');
+				for (var i=0; i < tabsContent.length; i++){
+					tabsContent[i].classList.add('hide');
+				};
 
-				//@FIXME custom attr
-				if (this.id === 'js-tab-spam'){
-					document.getElementById('js-spam-block').classList.remove('hide');
-				}else if(this.id === 'js-tab-arhi'){
-					document.getElementById('js-arch-block').classList.remove('hide');
-				}else if (this.id === 'js-tab-grabli'){
-					document.getElementById('js-grabli-block').classList.remove('hide');
-				}
+				document.getElementById(this.getAttribute('tabId')).classList.remove('hide');
 			};
 		};
 	})();
